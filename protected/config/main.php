@@ -8,6 +8,8 @@
 return array(
 	'basePath'=>dirname(__FILE__).DIRECTORY_SEPARATOR.'..',
 	'name'=>'Trackers-MVP',
+  'sourceLanguage' => 'en_US',
+  'language' => 'ru',
 
 	// preloading 'log' component
 	'preload'=>array('log'),

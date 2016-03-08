@@ -28,9 +28,25 @@ class SiteController extends Controller
 	public function actionIndex()
 	{
     $this->layout = 'content_only';
-		// renders the view file 'protected/views/site/index.php'
-		// using the default layout 'protected/views/layouts/main.php'
-		$this->render('index');
+
+    $loginModel=new LoginForm;
+
+    if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
+    {
+      echo CActiveForm::validate($loginModel);
+      Yii::app()->end();
+    }
+
+    // collect user input data
+    if(isset($_POST['LoginForm']))
+    {
+      $loginModel->attributes=$_POST['LoginForm'];
+      // validate user input and redirect to the previous page if valid
+      if($loginModel->validate() && $loginModel->login())
+        $this->redirect(Yii::app()->user->returnUrl);
+    }
+
+		$this->render('index', array('loginModel' => $loginModel));
 	}
 
 	/**
