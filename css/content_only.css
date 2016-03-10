@@ -2,3 +2,6 @@
 #register_box {
   display: none;
 }
+#content {
+  position: relative;
+}

@@ -1,6 +1,6 @@
 <?php
 
 return array(
-  'Log in' => 'Вход',
-  'Register' => "Регистрация"
+  'Log in' => 'Р’С…РѕРґ',
+  'Register' => "Р РµРіРёСЃС‚СЂР°С†РёСЏ"
 );

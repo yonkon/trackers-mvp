@@ -1,6 +1,6 @@
 <?php
 
-class SiteController extends Controller
+class SiteController extends RController
 {
 	/**
 	 * Declares class-based actions.
@@ -123,4 +123,27 @@ class SiteController extends Controller
 		Yii::app()->user->logout();
 		$this->redirect(Yii::app()->homeUrl);
 	}
+
+  public function filters() {
+    return array(
+      'rights', // perform access control for CRUD operations
+    );
+  }
+
+  public function accessRules()
+  {
+    return array(
+      array('allow', // Allow superusers to access Rights
+        'actions'=>array(
+          'index',
+          'error',
+          'contact',
+          'login',
+        ),
+      ),
+//      array('deny', // Deny all users
+//        'users'=>array('*'),
+//      ),
+    );
+  }
 }

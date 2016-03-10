@@ -1,0 +1,10 @@
+#content {
+  position: relative;
+}
+#rights .flashes {
+  width: 760px;
+  height: 40px;
+  position: absolute;
+  top: -5px;
+  left: 150px;
+}

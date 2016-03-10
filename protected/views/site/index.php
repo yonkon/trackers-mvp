@@ -2,13 +2,20 @@
 /** 
  * @var $this SiteController 
  * @var $loginModel LoginForm
+ * @var $app CApplication
  **/
-
-$this->pageTitle=Yii::app()->name;
+ $app = Yii::app();
+$this->pageTitle=$app->name;
+function tr($msg) { return Yii::t('general', $msg);}
 ?>
-
-<a href="javascript:void(0);" id="login_btn"><?= Yii::t('general', 'Log in') ?></a>
-<a href="javascript:void(0);" id="register_btn"><?= Yii::t('general', 'Register') ?></a>
+<?php if(Yii::app()->user->isGuest) : ?>
+  <a href="javascript:void(0);" id="login_btn"><?= Yii::t('general', 'Log in') ?></a>
+  <a href="javascript:void(0);" id="register_btn"><?= Yii::t('general', 'Register') ?></a>
+  <?php ; else : ?>
+  <a href="/logout" id="logout_btn"><?= Yii::t('general', 'Log out') ?></a>
+<?php ; if(UserModule::isAdmin()) { ?>
+    <a href="<?= $app->CreateUrl('rights/assignment') ?>"><?= tr('Доступы') ?></a>
+<?php  } endif; ?>
 
 <div id="login_box">
   <div class="form">
