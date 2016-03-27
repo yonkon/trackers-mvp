@@ -1,68 +1,45 @@
-yii-geoip
-=========
+Yii2 IpGeoBase.ru wrapper
+========================
+Компонент для работы с базой IP-адресов сайта [IpGeoBase.ru](http://ipgeobase.ru/), он
+реализует поиск географического местонахождения IP-адреса, выделенного RIPE локальным интернет-реестрам (LIR-ам).
+Для Российской Федерации и Украины с точностью до города.
 
-Yii Module to allow for easy usage of the MaxMind Free dbs.
+Установка
+----------
+Предпочтительным является способ установки через [composer](http://getcomposer.org/download/).
 
-Installation of the component:
-------------------------
-* Extract the release file under `protected/extensions`
-* Change main.php configuration file
+* Выполните команду
+
+```
+php composer.phar require --prefer-dist "himiklab/yii2-ipgeobase-component" "*"
+```
+
+или добавьте в `composer.json` в секцию `require` строку
+
+```json
+"himiklab/yii2-ipgeobase-component" : "*"
+```
+
+* Добавьте новый компонент в секцию `components` конфигурационного файла приложения:
 
 ```php
-        'components' => array(
-            ...
-            'geoip' => array(
-                'class' => 'application.extensions.geoip.CGeoIP',
-                // specify filename location for the corresponding database
-                'filename' => 'C:\path\to\GeoIP\GeoLiteCity.dat',
-                // Choose MEMORY_CACHE or STANDARD mode
-                'mode' => 'STANDARD',
-            ),
-            ...
-        ),
+'components' => [
+    'ipgeobase' => [
+        'class' => 'himiklab\ipgeobase\IpGeoBase',
+        'useLocalDB' => true,
+    ],
+    // ...
+],
 ```
 
-Usage instructions:
-------------------------
+* Если хотите использовать локальную базу IP-адресов (работает на порядки быстрее чем напрямую через сайт),
+то примените миграции из папки `migrations`, установите свойство компонента `useLocalDB` в `true`
+и добавьте вызов метода `IpGeoBase::updateDB` в ежедневное расписание `cron`. Не забыв вызвать его однократно
+для первоначального заполнения базы данных.
 
-All methods accept an IP address as an argument.
-If no argument is supplied CHttpRequest::getUserHostAddress() is used.
+Использование
+-------------
 ```php
-    $location = Yii::app()->geoip->lookupLocation();
-    $countryCode = Yii::app()->geoip->lookupCountryCode();
-    $countryName = Yii::app()->geoip->lookupCountryName();
-    $org = Yii::app()->geoip->lookupOrg();
-    $regionCode = Yii::app()->geoip->lookupRegion();
+var_dump(Yii::$app->ipgeobase->getLocation('144.206.192.6'));
+var_dump(Yii::$app->ipgeobase->getLocation('144.206.192.6', false));
 ```
-Location attributes:
-```php
-    $location->countryCode
-    $location->countryCode3
-    $location->countryName
-    $location->region
-    $location->regionName
-    $location->city
-    $location->postalCode
-    $location->latitude
-    $location->longitude
-    $location->areaCode
-    $location->dmaCode
-```
-
-
-How to update Maxmind Free DBs example:
-------------------------
-`updateGeoIP.sh`
-this script will only download if there is a new version of the database
-```bash
-    cd /usr/local/share/GeoIP
-    wget -N -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
-    wget -N -q http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/GeoIP.dat.gz
-    wget -N -q http://geolite.maxmind.com/download/geoip/database/GeoIPv6.dat.gz
-    
-    gunzip -c GeoLiteCity.dat.gz > GeoLiteCity.dat
-    gunzip -c GeoIP.dat.gz > GeoIP.dat
-    gunzip -c GeoIPv6.dat.gz > GeoIPv6.dat
-```
-
-* Setup a cron job to run this script monthly.
