@@ -46,7 +46,19 @@ class SiteController extends Controller
         $this->redirect(Yii::app()->user->returnUrl);
     }
 
-		$this->render('index', array('loginModel' => $loginModel));
+    /**
+     * @var $geoip CGeoIP
+     */
+    $geoip = Yii::app()->geoip;
+    $geoipData = array(
+    $location = $geoip->lookupLocation("46.118.51.83"),
+    $countryCode = $geoip->lookupCountryCode("46.118.51.83"),
+    $countryName = $geoip->lookupCountryName("46.118.51.83"),
+//    $org = $geoip->lookupOrg(),
+//    $regionCode = $geoip->lookupRegion(),
+  );
+
+		$this->render('index', array('loginModel' => $loginModel, 'geoip' =>$geoipData));
 	}
 
 	/**

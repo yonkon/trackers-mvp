@@ -150,6 +150,11 @@ return array(
 			),
 		),
 
+    'ipgeobase' => array(
+      'class' => 'application.extensions.geoip.IpGeoBase',
+      'useLocalDB' => true,
+    ),
+
 	),
 
 	// application-level parameters that can be accessed

@@ -78,3 +78,4 @@ function tr($msg) { return Yii::t('general', $msg);}
     });
   });
 </script>
+

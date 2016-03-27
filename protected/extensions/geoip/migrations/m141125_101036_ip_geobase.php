@@ -5,13 +5,13 @@
  * @license http://opensource.org/licenses/MIT MIT
  */
 
-use yii\db\Migration;
+
 
 class m141125_101036_ip_geobase extends Migration
 {
-    const DB_IP_TABLE_NAME = '{{%geobase_ip}}';
-    const DB_CITY_TABLE_NAME = '{{%geobase_city}}';
-    const DB_REGION_TABLE_NAME = '{{%geobase_region}}';
+    const DB_IP_TABLE_NAME = 'geobase_ip';
+    const DB_CITY_TABLE_NAME = 'geobase_city';
+    const DB_REGION_TABLE_NAME = 'geobase_region';
 
     public function up()
     {

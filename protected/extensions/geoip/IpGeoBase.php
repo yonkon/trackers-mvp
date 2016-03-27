@@ -5,11 +5,11 @@
  * @license http://opensource.org/licenses/MIT MIT
  */
 
-namespace himiklab\ipgeobase;
+//namespace himiklab\ipgeobase;
 
-use Yii;
-use yii\base\Component;
-use yii\base\Exception;
+//use Yii;
+//use yii\base\Component;
+//use yii\base\Exception;
 
 /**
  * Компонент для работы с базой IP-адресов сайта IpGeoBase.ru,
@@ -20,7 +20,7 @@ use yii\base\Exception;
  * @author HimikLab
  * @package himiklab\ipgeobase
  */
-class IpGeoBase extends Component
+class IpGeoBase extends CComponent
 {
     const XML_URL = 'http://ipgeobase.ru:7020/geo?ip=';
     const ARCHIVE_URL = 'http://ipgeobase.ru/files/db/Main/geo_files.zip';
@@ -28,9 +28,9 @@ class IpGeoBase extends Component
     const ARCHIVE_CITIES_FILE = 'cities.txt';
 
     const DB_IP_INSERTING_ROWS = 20000; // максимальный размер (строки) пакета для INSERT запроса
-    const DB_IP_TABLE_NAME = '{{%geobase_ip}}';
-    const DB_CITY_TABLE_NAME = '{{%geobase_city}}';
-    const DB_REGION_TABLE_NAME = '{{%geobase_region}}';
+    const DB_IP_TABLE_NAME = 'geobase_ip';
+    const DB_CITY_TABLE_NAME = 'geobase_city';
+    const DB_REGION_TABLE_NAME = 'eobase_region';
 
     /** @var bool $useLocalDB Использовать ли локальную базу данных */
     public $useLocalDB = false;
@@ -90,7 +90,7 @@ class IpGeoBase extends Component
         if (($fileName = $this->getArchive()) == false) {
             throw new Exception('Ошибка загрузки архива.');
         }
-        $zip = new \ZipArchive;
+        $zip = new ZipArchive;
         if ($zip->open($fileName) !== true) {
             @unlink($fileName);
             throw new Exception('Ошибка распаковки.');
@@ -109,7 +109,7 @@ class IpGeoBase extends Component
     protected function fromSite($ip)
     {
         $xmlData = $this->getRemoteContent(self::XML_URL . urlencode($ip));
-        $ipData = (new \SimpleXMLElement($xmlData))->ip;
+        $ipData = (new SimpleXMLElement($xmlData))->ip;
         if (isset($ip->message)) {
             return [];
         }
@@ -133,7 +133,7 @@ class IpGeoBase extends Component
         $dbCityTableName = self::DB_CITY_TABLE_NAME;
         $dbRegionTableName = self::DB_REGION_TABLE_NAME;
 
-        $result = Yii::$app->db->createCommand(
+        $result = Yii::app()->db->createCommand(
             "SELECT tIp.country_code AS country, tCity.name AS city,
                     tRegion.name AS region, tCity.latitude AS lat,
                     tCity.longitude AS lng
@@ -153,8 +153,8 @@ class IpGeoBase extends Component
     /**
      * Метод производит заполнение таблиц городов и регионов используя
      * данные из файла self::ARCHIVE_CITIES.
-     * @param $zip \ZipArchive
-     * @throws \yii\db\Exception
+     * @param $zip ZipArchive
+     * @throws Exception
      */
     protected function generateCityTables($zip)
     {
@@ -181,8 +181,8 @@ class IpGeoBase extends Component
         }
 
         // города
-        Yii::$app->db->createCommand()->truncateTable(self::DB_CITY_TABLE_NAME)->execute();
-        Yii::$app->db->createCommand()->batchInsert(
+        Yii::app()->db->createCommand()->truncateTable(self::DB_CITY_TABLE_NAME)->execute();
+        Yii::app()->db->createCommand()->batchInsert(
             self::DB_CITY_TABLE_NAME,
             ['id', 'name', 'region_id', 'latitude', 'longitude'],
             $cities
@@ -193,8 +193,8 @@ class IpGeoBase extends Component
         foreach ($uniqueRegions as $regionUniqName => $regionUniqId) {
             $regions[] = [$regionUniqId, $regionUniqName];
         }
-        Yii::$app->db->createCommand()->truncateTable(self::DB_REGION_TABLE_NAME)->execute();
-        Yii::$app->db->createCommand()->batchInsert(
+        Yii::app()->db->createCommand()->truncateTable(self::DB_REGION_TABLE_NAME)->execute();
+        Yii::app()->db->createCommand()->batchInsert(
             self::DB_REGION_TABLE_NAME,
             ['id', 'name'],
             $regions
@@ -204,8 +204,8 @@ class IpGeoBase extends Component
     /**
      * Метод производит заполнение таблиц IP-адресов используя
      * данные из файла self::ARCHIVE_IPS.
-     * @param $zip \ZipArchive
-     * @throws \yii\db\Exception
+     * @param $zip ZipArchive
+     * @throws Exception
      */
     protected function generateIpTable($zip)
     {
@@ -215,18 +215,18 @@ class IpGeoBase extends Component
         $i = 0;
         $values = '';
         $dbIpTableName = self::DB_IP_TABLE_NAME;
-        Yii::$app->db->createCommand()->truncateTable($dbIpTableName)->execute();
+        Yii::app()->db->createCommand()->truncateTable($dbIpTableName)->execute();
         foreach ($ipsArray as $ip) {
             $row = explode("\t", $ip);
             $values .= '(' . (float)$row[0] .
                 ',' . (float)$row[1] .
-                ',' . Yii::$app->db->quoteValue($row[3]) .
+                ',' . Yii::app()->db->quoteValue($row[3]) .
                 ',' . ($row[4] !== '-' ? (int)$row[4] : 0) .
                 ')';
             ++$i;
 
             if ($i === self::DB_IP_INSERTING_ROWS) {
-                Yii::$app->db->createCommand(
+                Yii::app()->db->createCommand(
                     "INSERT INTO {$dbIpTableName} (ip_begin, ip_end, country_code, city_id)
                     VALUES {$values}"
                 )->execute();
@@ -238,7 +238,7 @@ class IpGeoBase extends Component
         }
 
         // оставшиеся строки не вошедшие в пакеты
-        Yii::$app->db->createCommand(
+        Yii::app()->db->createCommand(
             "INSERT INTO {$dbIpTableName} (ip_begin, ip_end, country_code, city_id)
             VALUES " . rtrim($values, ',')
         )->execute();
@@ -255,7 +255,7 @@ class IpGeoBase extends Component
             return false;
         }
 
-        $fileName = Yii::getAlias('@runtime') . DIRECTORY_SEPARATOR .
+        $fileName = Yii::getRuntimePath() . DIRECTORY_SEPARATOR .
             substr(strrchr(self::ARCHIVE_URL, '/'), 1);
         if (file_put_contents($fileName, $fileData) != false) {
             return $fileName;
