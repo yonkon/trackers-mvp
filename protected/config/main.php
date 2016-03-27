@@ -66,7 +66,7 @@ return array(
       'returnUrl' => array('/user/profile'),
 
       # page after logout
-      'returnLogoutUrl' => array('/'),
+      'returnLogoutUrl' => array('//'),
     ),
     'rights'=>array(
       'superuserName'=>'Admin', // Name of the role with super user privileges.
@@ -115,6 +115,7 @@ return array(
       'showScriptName'=>false,
       'caseSensitive'=>false,
 			'rules'=>array(
+//        'index' => 'site/index',
         'login' => 'user/login',
         'logout' => 'user/logout',
 				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
