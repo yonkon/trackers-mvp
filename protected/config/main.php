@@ -98,6 +98,7 @@ return array(
       // enable cookie-based authentication
       'allowAutoLogin'=>true,
       'loginUrl'=>array('/user/login'),
+      'returnUrl'=>array('/user/profile'),
 
     ),
     'authManager'=>array(
@@ -124,6 +125,7 @@ return array(
 				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 				'user'=>'/user/user',
+				'profile'=>'/user/profile',
 				'<action:\w+>'=>'site/<action>',
 			),
 		),

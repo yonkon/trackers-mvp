@@ -6,7 +6,7 @@
 * @copyright Copyright &copy; 2010 Christoffer Niska
 * @since 0.5
 */
-class RWebUser extends CWebUser
+class RWebUser extends WebUser
 {
 	/**
 	* Actions to be taken after logging in.

@@ -13,6 +13,7 @@ function tr($msg) { return Yii::t('general', $msg);}
 <? $this->renderPartial('top_links', array('app' => $app));?>
 
 <div id="login_box">
+  <h2><?= tr('Log in') ?></h2>
   <div class="form">
     <?php
     /**
@@ -58,6 +59,7 @@ function tr($msg) { return Yii::t('general', $msg);}
 </div>
 
 <div id="register_box">
+  <h2><?= tr('Registration') ?></h2>
 
   <?php if(Yii::app()->user->hasFlash('registration')): ?>
     <div class="success">
@@ -146,6 +148,9 @@ function tr($msg) { return Yii::t('general', $msg);}
 
       <div class="row submit">
         <?php echo CHtml::submitButton(UserModule::t("Register")); ?>
+      </div>
+      <div class="forgot_password">
+        <a href="<?= $app->createUrl('/user/recovery'); ?>"><?= tr("Забыл пароль")?></a>
       </div>
 
       <?php $this->endWidget(); ?>

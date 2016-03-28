@@ -54,15 +54,16 @@ class SiteController extends Controller
     {
       $loginModel->attributes=$_POST['LoginForm'];
       // validate user input and redirect to the previous page if valid
-      if($loginModel->validate() && $loginModel->login())
-        $this->redirect($app->user->returnUrl);
+      if($loginModel->validate() && $loginModel->login()) {
+        $this->redirect($app->createUrl('/profile'));
+      }
     }
 
     /**
      * @var $geoip CGeoIP
      */
 
-    $app->IpGeoBase->UpdateDB();
+//    $app->IpGeoBase->UpdateDB();
     $geoip = $app->IpGeoBase->getLocation('46.118.51.83');
 		$this->render('index', array(
       'loginModel' => $loginModel,
@@ -145,8 +146,9 @@ class SiteController extends Controller
 		{
 			$model->attributes=$_POST['LoginForm'];
 			// validate user input and redirect to the previous page if valid
-			if($model->validate() && $model->login())
-				$this->redirect($app->user->returnUrl);
+			if($model->validate() && $model->login()) {
+        $this->redirect($app->createUrl('/profile'));
+      }
 		}
 		// display the login form
 		$this->render('login',array('model'=>$model));
