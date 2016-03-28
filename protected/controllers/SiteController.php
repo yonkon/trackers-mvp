@@ -38,7 +38,7 @@ class SiteController extends Controller
     $app = Yii::app();
     $this->layout = 'content_only';
 
-    $loginModel=new LoginForm;
+    $loginModel=new UserLogin;
     $regModel = new RegistrationForm;
     $regProfile=new Profile;
     $regProfile->regMode = true;
@@ -132,7 +132,7 @@ class SiteController extends Controller
      * @var $app CWebApplication
      */
     $app = Yii::app();
-		$model=new LoginForm;
+		$model=new UserLogin();
 
 		// if it is ajax validation request
 		if(isset($_POST['ajax']) && $_POST['ajax']==='login-form')
