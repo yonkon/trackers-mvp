@@ -50,12 +50,15 @@ class SiteController extends Controller
     }
 
     // collect user input data
-    if(isset($_POST['LoginForm']))
+    if(isset($_POST['UserLogin']))
     {
       $loginModel->attributes=$_POST['LoginForm'];
       // validate user input and redirect to the previous page if valid
-      if($loginModel->validate() && $loginModel->login()) {
-        $this->redirect($app->createUrl('/profile'));
+      if($loginModel->validate() ) {
+//        $loginModel->authenticate();
+        if(!$loginModel->hasErrors()) {
+          $this->redirect($app->createUrl('/profile'));
+        }
       }
     }
 
@@ -64,7 +67,7 @@ class SiteController extends Controller
      */
 
 //    $app->IpGeoBase->UpdateDB();
-    $geoip = $app->IpGeoBase->getLocation('46.118.51.83');
+    $geoip = $app->IpGeoBase->getLocation();
 		$this->render('index', array(
       'loginModel' => $loginModel,
       'geoip' =>$geoip,

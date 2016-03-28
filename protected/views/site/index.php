@@ -22,12 +22,13 @@ function tr($msg) { return Yii::t('general', $msg);}
     $form=$this->beginWidget('CActiveForm', array(
       'id'=>'login-form',
       'enableClientValidation'=>true,
+      'action'=>$app->createUrl('/login'),
       'clientOptions'=>array(
         'validateOnSubmit'=>true,
       ),
     )); ?>
 
-    <p class="note"> Fields with <span class="required">*</span> are required.</p>
+    <? if(false) { ?><p class="note"><?php echo UserModule::t('Fields with <span class="required">*</span> are required.'); ?></p><? } ?>
 
     <div class="row">
       <?php echo $form->labelEx($loginModel,'username'); ?>
@@ -39,9 +40,6 @@ function tr($msg) { return Yii::t('general', $msg);}
       <?php echo $form->labelEx($loginModel,'password'); ?>
       <?php echo $form->passwordField($loginModel,'password'); ?>
       <?php echo $form->error($loginModel,'password'); ?>
-      <p class="hint">
-        Hint: You may login with <kbd>demo</kbd>/<kbd>demo</kbd> or <kbd>admin</kbd>/<kbd>admin</kbd>.
-      </p>
     </div>
 
     <div class="row rememberMe">
@@ -59,7 +57,7 @@ function tr($msg) { return Yii::t('general', $msg);}
 </div>
 
 <div id="register_box">
-  <h2><?= tr('Registration') ?></h2>
+  <h2><?= tr('Регистрация') ?></h2>
 
   <?php if(Yii::app()->user->hasFlash('registration')): ?>
     <div class="success">
@@ -78,7 +76,7 @@ function tr($msg) { return Yii::t('general', $msg);}
         'htmlOptions' => array('enctype'=>'multipart/form-data', )
       )); ?>
 
-      <p class="note"><?php echo UserModule::t('Fields with <span class="required">*</span> are required.'); ?></p>
+      <? if(false) { ?><p class="note"><?php echo UserModule::t('Fields with <span class="required">*</span> are required.'); ?></p><? } ?>
 
       <?php echo $form->errorSummary(array($regModel,$regProfile)); ?>
 
@@ -150,7 +148,7 @@ function tr($msg) { return Yii::t('general', $msg);}
         <?php echo CHtml::submitButton(UserModule::t("Register")); ?>
       </div>
       <div class="forgot_password">
-        <a href="<?= $app->createUrl('/user/recovery'); ?>"><?= tr("Забыл пароль")?></a>
+        <a href="<?= $app->createUrl('/user/recovery'); ?>"><?= tr("Забыли пароль?")?></a>
       </div>
 
       <?php $this->endWidget(); ?>

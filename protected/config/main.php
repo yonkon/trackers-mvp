@@ -64,7 +64,7 @@ return array(
       'loginUrl' => array('/user/login'),
 
       # page after login
-      'returnUrl' => array('/user/profile'),
+      'returnUrl' => array('/profile'),
 
       # page after logout
       'returnLogoutUrl' => array('//'),
@@ -98,7 +98,7 @@ return array(
       // enable cookie-based authentication
       'allowAutoLogin'=>true,
       'loginUrl'=>array('/user/login'),
-      'returnUrl'=>array('/user/profile'),
+      'returnUrl'=>array('/profile'),
 
     ),
     'authManager'=>array(

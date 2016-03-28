@@ -45,7 +45,7 @@ class IpGeoBase extends CApplicationComponent
     {
       if(empty($ip)) {
         $ip = self::get_client_ip();
-        $ip = '46.118.51.83';
+//        $ip = '46.118.51.83';
       }
         if ($this->useLocalDB) {
           $ipDataArray = $this->fromDB($ip);
@@ -70,7 +70,7 @@ class IpGeoBase extends CApplicationComponent
      */
     public function speedTest($iterations)
     {
-        $ips = [];
+        $ips = array();
         for ($i = 0; $i < $iterations; ++$i) {
             $ips[] = mt_rand(0, 255) . '.' . mt_rand(0, 255) . '.' . mt_rand(0, 255) . '.' . mt_rand(0, 255);
         }
@@ -159,18 +159,19 @@ CREATE TABLE IF NOT EXISTS `geobase_params` (
     protected function fromSite($ip)
     {
         $xmlData = $this->getRemoteContent(self::XML_URL . urlencode($ip));
-        $ipData = (new SimpleXMLElement($xmlData))->ip;
+        $xmlElement = (new SimpleXMLElement($xmlData));
+        $ipData = $xmlElement->ip;
         if (isset($ip->message)) {
-            return [];
+            return array();
         }
 
-        return [
+        return array(
             'country' => (string)$ipData->country,
             'city' => isset($ipData->city) ? (string)$ipData->city : null,
             'region' => isset($ipData->region) ? (string)$ipData->region : null,
             'lat' => isset($ipData->lat) ? (string)$ipData->lat : null,
             'lng' => isset($ipData->lng) ? (string)$ipData->lng : null
-        ];
+    );
     }
 
     /**
@@ -200,7 +201,7 @@ CREATE TABLE IF NOT EXISTS `geobase_params` (
         if ($result != false) {
             return $result;
         } else {
-            return [];
+            return array();
         }
     }
 
@@ -219,8 +220,8 @@ CREATE TABLE IF NOT EXISTS `geobase_params` (
         $citiesArray = explode("\n", $zip->getFromName(self::ARCHIVE_CITIES_FILE));
         array_pop($citiesArray); // пустая строка
 
-        $cities = [];
-        $uniqueRegions = [];
+        $cities = array();
+        $uniqueRegions = array();
         $regionId = 1;
         foreach ($citiesArray as $city) {
             $row = explode("\t", $city);
@@ -243,20 +244,20 @@ CREATE TABLE IF NOT EXISTS `geobase_params` (
 //        $app->db->createCommand()->truncateTable(self::DB_CITY_TABLE_NAME)->execute();
         $app->db->createCommand()->insertMultiple(
             self::DB_CITY_TABLE_NAME,
-            ['id', 'name', 'region_id', 'latitude', 'longitude'],
+          array('id', 'name', 'region_id', 'latitude', 'longitude'),
             $cities
         );
 
         // регионы
-        $regions = [];
+        $regions = array();
         foreach ($uniqueRegions as $regionUniqName => $regionUniqId) {
-            $regions[] = ['id' => $regionUniqId, 'name' => $regionUniqName];
+            $regions[] = array('id' => $regionUniqId, 'name' => $regionUniqName);
         }
         $app->db->createCommand()->truncateTable(self::DB_REGION_TABLE_NAME);
 //        $app->db->createCommand()->truncateTable(self::DB_REGION_TABLE_NAME)->execute();
         $app->db->createCommand()->insertMultiple(
             self::DB_REGION_TABLE_NAME,
-            ['id', 'name'],
+          array('id', 'name'),
             $regions
         );
     }
@@ -359,16 +360,12 @@ CREATE TABLE IF NOT EXISTS `geobase_params` (
      */
     protected function getRemoteContent($url)
     {
-      /**
-       * @var CWebApplication $app
-       */
-      $app = Yii::app();
         if (function_exists('curl_version')) {
             $curl = curl_init($url);
-            curl_setopt_array($curl, [
+            curl_setopt_array($curl, array(
                 CURLOPT_HEADER => false,
                 CURLOPT_RETURNTRANSFER => true
-            ]);
+            ));
             $data = curl_exec($curl);
             curl_close($curl);
             return $data;
