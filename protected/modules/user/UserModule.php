@@ -51,7 +51,7 @@ class UserModule extends CWebModule
 	 * @desc login after registration (need loginNotActiv or activeAfterRegister = true)
 	 */
 	public $autoLogin=true;
-	
+	public $defaultController = 'user';
 	public $registrationUrl = array("/user/registration");
 	public $recoveryUrl = array("/user/recovery/recovery");
 	public $loginUrl = array("/user/login");

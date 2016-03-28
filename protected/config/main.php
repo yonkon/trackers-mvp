@@ -23,6 +23,7 @@ return array(
     'application.modules.user.components.*',
     'application.modules.rights.*',
     'application.modules.rights.components.*',
+    'application.extensions.IpGeoBase.*',
 	),
 
 	'modules'=>array(
@@ -38,7 +39,7 @@ return array(
       'tableUsers' => 'tbl_users',
       'tableProfiles' => 'tbl_profiles',
       'tableProfileFields' => 'tbl_profiles_fields',
-
+      'captcha' => array(),
       'hash' => 'md5',
 
       # send activation email
@@ -97,6 +98,7 @@ return array(
       // enable cookie-based authentication
       'allowAutoLogin'=>true,
       'loginUrl'=>array('/user/login'),
+
     ),
     'authManager'=>array(
       'class'=>'RDbAuthManager',
@@ -118,9 +120,10 @@ return array(
 //        'index' => 'site/index',
         'login' => 'user/login',
         'logout' => 'user/logout',
-				'<controller:\w+>/<id:\d+>'=>'<controller>/view',
+				'<controller:\w+>/<id:\d+>'=>'<controller>/view/<id>',
 				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
+				'user'=>'/user/user',
 				'<action:\w+>'=>'site/<action>',
 			),
 		),
@@ -150,8 +153,8 @@ return array(
 			),
 		),
 
-    'ipgeobase' => array(
-      'class' => 'application.extensions.geoip.IpGeoBase',
+    'IpGeoBase' => array(
+      'class' => 'IpGeoBase',
       'useLocalDB' => true,
     ),
 
