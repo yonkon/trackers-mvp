@@ -126,6 +126,8 @@ return array(
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
 				'user'=>'/user/user',
 				'profile'=>'/user/profile',
+				'panel'=>'/panel/index',
+				'panel/<action:\w+>'=>'/panel/<action>',
 				'<action:\w+>'=>'site/<action>',
 			),
 		),
