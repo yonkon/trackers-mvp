@@ -61,10 +61,10 @@ return array(
       'recoveryUrl' => array('/user/recovery'),
 
       # login form path
-      'loginUrl' => array('/user/login'),
+      'loginUrl' => array('/login'),
 
       # page after login
-      'returnUrl' => array('/profile'),
+      'returnUrl' => array('/panel'),
 
       # page after logout
       'returnLogoutUrl' => array('//'),
@@ -97,8 +97,8 @@ return array(
       'class'=>'RWebUser',
       // enable cookie-based authentication
       'allowAutoLogin'=>true,
-      'loginUrl'=>array('/user/login'),
-      'returnUrl'=>array('/profile'),
+      'loginUrl'=>array('/login'),
+      'returnUrl'=>array('/panel'),
 
     ),
     'authManager'=>array(
@@ -121,13 +121,13 @@ return array(
 //        'index' => 'site/index',
         'login' => 'user/login',
         'logout' => 'user/logout',
+        'user'=>'/user/user',
+        'profile'=>'/user/profile',
+        'panel'=>'/panel/index',
+        'panel/<action:\w+>'=>'/panel/<action>',
 				'<controller:\w+>/<id:\d+>'=>'<controller>/view/<id>',
 				'<controller:\w+>/<action:\w+>/<id:\d+>'=>'<controller>/<action>',
 				'<controller:\w+>/<action:\w+>'=>'<controller>/<action>',
-				'user'=>'/user/user',
-				'profile'=>'/user/profile',
-				'panel'=>'/panel/index',
-				'panel/<action:\w+>'=>'/panel/<action>',
 				'<action:\w+>'=>'site/<action>',
 			),
 		),

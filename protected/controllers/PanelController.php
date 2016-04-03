@@ -2,6 +2,9 @@
 
 class PanelController extends Controller
 {
+
+  public $defaultAction = 'index';
+
 	public function actionIndex()
 	{
 		$this->render('index');
