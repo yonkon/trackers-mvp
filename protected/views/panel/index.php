@@ -8,11 +8,17 @@ $this->breadcrumbs=array(
 <h1><?php echo $this->id . '/' . $this->action->id; ?></h1>
 
 <div class="panel">
-  <div class="panel-heading">
+  <div class="p-heading">
     wrlcome user / info /
   </div>
-  <div class="panel-body">
-    <div class="tab-container">
+  <div class="p-body">
+    <div class="p-tabs">
+      <div class="p-tab">Time tracker</div>
+      <div class="p-tab">Task tracker</div>
+      <div class="p-tab">Rss reader</div>
+      <div class="p-tab">Notes</div>
+      <div class="p-tab">Favourites</div>
+      <div class="p-tab">Radio</div>
       <!--$this->widget('zii.widgets.jui.CJuiTabs',array(
       'tabs'=>array(
       'StaticTab 1'=>'Content for tab 1',
