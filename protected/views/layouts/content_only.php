@@ -11,17 +11,13 @@
   <meta name="language" content="ru">
 
   <!-- blueprint CSS framework -->
-  <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/screen.css"
-        media="screen, projection">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/screen.css" media="screen, projection">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/print.css" media="print">
   <!--[if lt IE 8]>
-  <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/ie.css"
-        media="screen, projection">
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/ie.css" media="screen, projection">
   <![endif]-->
 
-  <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/print.css" media="print">
-
   <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/main.css">
-
   <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/form.css">
 
   <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/bootstrap.css">
@@ -31,7 +27,7 @@
   <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/js/jui/css/base/jquery-ui.css">
   <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/js/treeview/jquery.treeview.css">
   <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/js/yiitab/jquery.yiitab.css">
-
+	<link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/styles.css">
   <title><?php echo CHtml::encode($this->pageTitle); ?></title>
   <script type="text/javascript" src="/js/jquery.js"></script>
   <script type="text/javascript" src="/js/jquery.yii.js"></script>
@@ -55,6 +51,11 @@
   <div id="header">
     <div id="logo"><?php echo CHtml::encode(Yii::app()->name); ?></div>
   </div>
+  <?php if(isset($this->breadcrumbs)):?>
+    <?php $this->widget('zii.widgets.CBreadcrumbs', array(
+      'links'=>$this->breadcrumbs,
+    )); ?><!-- breadcrumbs -->
+  <?php endif?>
   <!-- header -->
   <?php echo $content; ?>
   <div class="clear"></div>

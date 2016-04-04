@@ -1,40 +1,12 @@
 <?php
 
-
-class PanelController extends Controller
+class TimeTrackerController extends Controller
 {
-
-  public $defaultAction = 'index';
-
 	public function actionIndex()
 	{
-    /**
-     * @var $app CWebApplication
-     */
-    $app = Yii::app();
-    if(!$app->user->checkAccess('Panel.*')) {
-      $this->redirect($app->createUrl('login'));
-    }
 		$this->render('index');
 	}
 
-  public function filters()
-  {
-    return array(
-      'accessControl',
-      'rights'
-    );
-  }
-
-  public function accessRules(){
-    return array(
-
-      array('allow',
-        'roles' => array('Authenticated')),
-
-      array('deny')
-    );
-  }
 	// Uncomment the following methods and override them if needed
 	/*
 	public function filters()

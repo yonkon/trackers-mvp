@@ -7,6 +7,7 @@
  */
 class SiteController extends Controller
 {
+  public $layout = 'content_only';
 	/**
 	 * Declares class-based actions.
 	 */

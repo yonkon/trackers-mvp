@@ -8,3 +8,87 @@
   top: -5px;
   left: 150px;
 }
+
+.p-heading {
+  padding: 8px;
+  background: rgb(245, 244, 255);
+  border-radius: 4px;
+  border: 1px groove rgb(145, 133, 182);
+  margin-bottom: 1em;
+}
+
+.p-tabs {
+  margin-left: -7em;
+  width: 6.5em;
+  display: inline-block;
+  float: left;
+}
+
+.p-tab.active {
+  background-color: rgba(216, 213, 255, 0.4);
+}
+.p-tab {
+  width: 6.4em;
+  margin-top: 2em;
+  display: inline-block;
+  padding: 0.5em;
+  border: 1px solid rgb(216, 213, 228);
+  box-sizing: border-box;
+  border-radius: 5px 0 0 5px;
+  cursor: pointer;
+}
+
+.p-body {
+  position: relative;
+  margin-left: 7em;
+  border: 1px groove rgb(216, 213, 228);
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.p-item.active {
+  display: block;
+}
+.p-item {
+  padding: 5px;
+  display: none;
+  position: absolute;
+  top: 0.3em;
+  bottom: 0.3em;
+  left: 0.3em;
+  right: 0.3em;
+  background-color: #fff;
+}
+
+.p-content {
+  position: absolute;
+  top: 0.3em;
+  bottom: 0.3em;
+  left: 0.3em;
+  right: 0.3em;
+  background-color: #fdfdfe;
+
+}
+
+.p-footer {
+  margin-top: 2em;
+  padding: 8px;
+  background: rgba(72, 61, 139, 0.5);
+  border-radius: 2px;
+}
+
+
+.p-icons {
+  list-style: none;
+}
+.p-icon {
+  display: inline-block;
+  margin-left: 4em;
+}
+
+.p-links {
+  padding-left: 20px;
+}
+.p-links a {
+  margin-left: 4em;
+}

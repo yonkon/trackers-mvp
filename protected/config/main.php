@@ -104,7 +104,7 @@ return array(
     'authManager'=>array(
       'class'=>'RDbAuthManager',
       'connectionID'=>'db',
-      'defaultRoles'=>array('Authenticated', 'Guest'),
+      'defaultRoles'=>array(/*'Authenticated',*/ 'Guest'),
       'itemTable'=>'authitem',
       'itemChildTable'=>'authitemchild',
       'assignmentTable'=>'authassignment',
@@ -123,6 +123,7 @@ return array(
         'logout' => 'user/logout',
         'user'=>'/user/user',
         'profile'=>'/user/profile',
+        'gii'=>'/gii/default',
         'panel'=>'/panel/index',
         'panel/<action:\w+>'=>'/panel/<action>',
 				'<controller:\w+>/<id:\d+>'=>'<controller>/view/<id>',
