@@ -15,7 +15,10 @@ class PanelController extends Controller
     if(!$app->user->checkAccess('Panel.*')) {
       $this->redirect($app->createUrl('login'));
     }
-		$this->render('index');
+    $timeTracker = $this->renderPartial('time_tracker', array(), true);
+		$this->render('index', array(
+      'timeTracker'=>$timeTracker
+    ));
 	}
 
   public function filters()

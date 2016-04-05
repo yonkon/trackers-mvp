@@ -21,7 +21,7 @@ $this->breadcrumbs=array(
       <div class="p-tab" id="radio_tab">      Radio         </div>
     </div>
     <div class="p-content">
-      <div class="p-item active" id="time_content"> Time tracker  </div>
+      <div class="p-item active" id="time_content"><?php echo $timeTracker ?></div>
       <div class="p-item" id="task_content">        Task tracker  </div>
       <div class="p-item" id="rss_content">         Rss reader    </div>
       <div class="p-item" id="notes_content">       Notes         </div>

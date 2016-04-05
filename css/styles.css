@@ -92,3 +92,31 @@
 .p-links a {
   margin-left: 4em;
 }
+
+
+
+.widget-header h2 {
+  display: inline-block;
+  margin: 1em 2em;
+}
+.widget-header .controls b {
+  display: inline-block;
+  margin: 0 2px;
+  cursor: pointer;
+
+}
+.widget-header .controls {
+  cursor: default;
+  float: right;
+  margin: 1em 2em;
+  font-size: 17pt;
+}
+
+li.project:last-of-type {
+  list-style: none;
+}
+
+li.project:last-of-type:before {
+  content: '+ ';
+  margin-left: -1em;
+}
