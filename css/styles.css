@@ -18,8 +18,10 @@
 }
 
 .p-tabs {
-  margin-left: -7em;
-  width: 6.5em;
+  /*margin-left: -7em;*/
+  margin-left: -85px;
+  /*width: 6.5em;*/
+  width: 78px;
   display: inline-block;
   float: left;
 }
@@ -28,10 +30,13 @@
   background-color: rgba(216, 213, 255, 0.4);
 }
 .p-tab {
-  width: 6.4em;
-  margin-top: 2em;
+  /*width: 6.4em;*/
+  width: 77px;
+  /*margin-top: 2em;*/
+  margin-top: 28px;
   display: inline-block;
-  padding: 0.5em;
+  /*padding: 0.5em;*/
+  padding: 7px;
   border: 1px solid rgb(216, 213, 228);
   box-sizing: border-box;
   border-radius: 5px 0 0 5px;
@@ -40,7 +45,8 @@
 
 .p-body {
   position: relative;
-  margin-left: 7em;
+  /*margin-left: 7em;*/
+  margin-left: 82px;
   border: 1px groove rgb(216, 213, 228);
   padding: 8px;
   border-radius: 4px;
@@ -53,25 +59,28 @@
   padding: 5px;
   display: none;
   position: absolute;
-  top: 0.3em;
-  bottom: 0.3em;
-  left: 0.3em;
-  right: 0.3em;
+  /*top: 0.3em;*/
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
   background-color: #fff;
 }
 
 .p-content {
   position: absolute;
-  top: 0.3em;
-  bottom: 0.3em;
-  left: 0.3em;
-  right: 0.3em;
+  /*top: 0.3em;*/
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
   background-color: #fdfdfe;
 
 }
 
 .p-footer {
-  margin-top: 2em;
+  /*margin-top: 2em;*/
+  margin-top: 28px;
   padding: 8px;
   background: rgba(72, 61, 139, 0.5);
   border-radius: 2px;
@@ -83,21 +92,24 @@
 }
 .p-icon {
   display: inline-block;
-  margin-left: 4em;
+  /*margin-left: 4em;*/
+  margin-left: 56px;
 }
 
 .p-links {
   padding-left: 20px;
 }
 .p-links a {
-  margin-left: 4em;
+  /*margin-left: 4em;*/
+  margin-left: 56px;
 }
 
 
 
 .widget-header h2 {
   display: inline-block;
-  margin: 1em 2em;
+  /*margin: 1em 2em;*/
+  margin: 14px 28px;
 }
 .widget-header .controls b {
   display: inline-block;
@@ -108,15 +120,77 @@
 .widget-header .controls {
   cursor: default;
   float: right;
-  margin: 1em 2em;
+  /*margin: 1em 2em;*/
+  margin: 14px 28px;
   font-size: 17pt;
 }
 
-li.project:last-of-type {
+/*li.project:last-of-type {
   list-style: none;
 }
 
 li.project:last-of-type:before {
   content: '+ ';
   margin-left: -1em;
+}*/
+li.project div {
+  display: inline-block;
+}
+
+li.project {
+  list-style: none;
+}
+
+
+li.project .hid-control {
+  display: none;
+}
+
+li.project .position {
+  /*width: 3em;*/
+  width: 42px;
+  /*margin-right: 0.5em;*/
+  margin-right: 7px;
+}
+
+li.project .name {
+  /*width: 12em;*/
+  width: 176px;
+  /*margin-right: 1em;*/
+  margin-right: 14px;
+}
+
+.green-text {
+  color: green;
+}
+
+.red-text {
+  color: red;
+}
+
+li.project .controls {
+  /*width: 2.5em;*/
+  width: 35px;
+}
+
+li.project.header .time {
+  text-align: center;
+  padding-bottom: 14px;
+}
+
+li.project.header {
+  /*padding-left: 20em;*/
+  padding-left: 286px;
+}
+
+li.project .time {
+  /*width: 7em;*/
+  width: 98px;
+  /*margin-left: 3em;*/
+  margin-left: 42px;
+  background: #89b6cd;
+}
+
+.project-add {
+  margin-left: 20px;
 }
