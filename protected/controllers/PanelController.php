@@ -15,7 +15,8 @@ class PanelController extends Controller
     if(!$app->user->checkAccess('Panel.*')) {
       $this->redirect($app->createUrl('login'));
     }
-    $timeTracker = $this->renderPartial('time_tracker', array(), true);
+    $timeProjects = array();
+    $timeTracker = $this->renderPartial('time_tracker', array('timeProjects' => $timeProjects), true);
 		$this->render('index', array(
       'timeTracker'=>$timeTracker
     ));
@@ -38,6 +39,7 @@ class PanelController extends Controller
       array('deny')
     );
   }
+
 	// Uncomment the following methods and override them if needed
 	/*
 	public function filters()

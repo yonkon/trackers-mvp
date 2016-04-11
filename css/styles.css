@@ -193,4 +193,24 @@ li.project .time {
 
 .project-add {
   margin-left: 20px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+#new_project_box {
+  display: none;
+  position: relative;
+  width: 220px;
+}
+
+.wrapper-shadow {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  background: url('../images/ajax-bar-gray.gif') 50% 50% no-repeat rgba(50,50,50, 0.4);
+  background-size: cover;
 }

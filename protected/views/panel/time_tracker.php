@@ -2,7 +2,9 @@
 /**
  *
  * @var PanelController $this
+ * @var $app CWebApplication
  */
+$app = Yii::app();
 ?>
 <div class="widget-header">
   <h2>Time-tracker</h2>
@@ -20,7 +22,7 @@
       <div class="time">month</div>
       <div class="time">custom</div>
     </li>
-    <? foreach($projects as $project) : ?>
+    <? foreach($timeProjects as $project) : ?>
     <li class="project" data-id="{id}" data-status="{status}">
       <div class="position">{position}</div>
       <div class="name">{name}
@@ -54,5 +56,49 @@
     </li>
     <? endforeach; ?>
   </ol>
+  <div id="new_project_box">
+    <div class="wrapper-shadow" id="new_project_loader">
+    </div>
+    <input id="new_project_name" name="Project[name]" placeholder="Наименование задачи">
+    <i id="create_project" class="glyphicon glyphicon-ok"></i>
+    <i class="glyphicon glyphicon-remove"></i>
+  </div>
   <div class="project-add"><i class="glyphicon glyphicon-plus-sign"></i> Добавить</div>
 </div>
+<script type="text/javascript">
+  $(function(){
+    $('.project-add').click(function(){
+      $('#new_project_box').show();
+      $('#new_project_name').focus();
+    });
+    $('#new_project_box .glyphicon-remove').click(
+      function(){$(this).parent().hide()}
+    );
+    $('#create_project').click(
+      function() {
+        var name = $('#new_project_name').val().trim();
+        $.ajax({
+          url: '<?= $app->createUrl('timeTracker/create') ?>',
+          type : 'post',
+          data : {
+            'timeProject[name]' : name,
+            ajax : true
+          },
+          beforeSend : function() {
+            $('#new_project_loader').show();
+          }
+        })
+          .success(function(data){
+            alert('ok');
+          })
+          .error(function(err){
+            alert(err.status + ' : ' + err.statusText );
+          })
+          .complete(function(){
+            $('#new_project_loader').hide();
+            $('#new_project_box').hide();
+          });
+      }
+    );
+  });
+</script>
