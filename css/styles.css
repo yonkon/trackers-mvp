@@ -82,7 +82,8 @@
   /*margin-top: 2em;*/
   margin-top: 28px;
   padding: 8px;
-  background: rgba(72, 61, 139, 0.5);
+  /*background: rgba(72, 61, 139, 0.5);*/
+  background: rgb(245, 244, 255);
   border-radius: 2px;
 }
 
@@ -142,22 +143,42 @@ li.project {
 }
 
 
+li.project .hid-control input{
+  width: 140px;
+  border: none;
+  border-bottom: 1px dashed lightgray;
+}
+
 li.project .hid-control {
   display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 li.project .position {
   /*width: 3em;*/
-  width: 42px;
+  width: 22px;
   /*margin-right: 0.5em;*/
   margin-right: 7px;
 }
 
+li.project .name .value {
+  display: inline-block;
+  line-height: 24px;
+}
 li.project .name {
+  position: relative;
   /*width: 12em;*/
   width: 176px;
   /*margin-right: 1em;*/
   margin-right: 14px;
+  height: 24px;
+}
+
+li.project>div {
+  height: 100%;
+  line-height: 24px;
 }
 
 .green-text {
@@ -168,31 +189,47 @@ li.project .name {
   color: red;
 }
 
+li.project .controls i, .name i {
+  cursor: pointer;
+  vertical-align: middle;
+  line-height: 24px;
+}
 li.project .controls {
   /*width: 2.5em;*/
   width: 35px;
 }
 
+li.project.header .time.calendar i {
+  cursor: pointer;
+}
+
 li.project.header .time {
+  position: relative;
   text-align: center;
-  padding-bottom: 14px;
+  padding: 7px 0;
+  cursor: default;
 }
 
 li.project.header {
   /*padding-left: 20em;*/
-  padding-left: 286px;
+  padding-left: 266px;
 }
 
 li.project .time {
-  /*width: 7em;*/
-  width: 98px;
-  /*margin-left: 3em;*/
-  margin-left: 42px;
-  background: #89b6cd;
+  width: 108px;
+  margin-left: 32px;
+  background: #C3D9FF;
+  box-shadow: 0 0 0px 2px #c3d9ff;
+}
+
+#custom_date_value {
+  box-shadow: 0 0 0px 2px #c3d9ff;
+
 }
 
 .project-add {
-  margin-left: 20px;
+  margin-left: 50px;
+  margin-top: 8px;
   cursor: pointer;
   display: inline-block;
 }
@@ -200,7 +237,8 @@ li.project .time {
 #new_project_box {
   display: none;
   position: relative;
-  width: 220px;
+  width: 304px;
+  margin-left: 50px;
 }
 
 .wrapper-shadow {
@@ -213,4 +251,36 @@ li.project .time {
   z-index: 2;
   background: url('../images/ajax-bar-gray.gif') 50% 50% no-repeat rgba(50,50,50, 0.4);
   background-size: cover;
+}
+
+#custom_date_value>div {
+  width: 100%;
+}
+
+#custom_date_value>div>input {
+  display: inline-block;
+  width: 70px;
+}
+#custom_date_value>div>label {
+  width: 15px;
+  display: inline-block;
+}
+#custom_date_value {
+  display: none;
+  position: absolute;
+  /*height: 40px;*/
+  top: 100%;
+  width: 100%;
+  /*display: block;*/
+  background: #C3D9FF;
+}
+
+.date-box {
+  display: inline-block;
+  width: 4em;
+  border: 1px solid lightgrey;
+}
+
+.pr-list {
+  margin-bottom: 7px;
 }

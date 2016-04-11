@@ -3,12 +3,13 @@
  *
  * @var $app CWebApplication
  * @var TimeTrackerController $this
+ * @var TimeProject $project
  */
 $app = Yii::app();
 ?>
-<li class="project" data-id="{id}" data-status="{status}">
-  <div class="position">{position}</div>
-  <div class="name">{name}
+<li class="project" data-id="<?= $project->id ?>" data-status="<?= $project->status ?>">
+  <div class="position"><?= $project->position ?></div>
+  <div class="name"><?= $project->name ?>
     <div class="hid-control">
       <input>
       <i class="ok glyphicon glyphicon-ok"></i>
@@ -25,13 +26,13 @@ $app = Yii::app();
     <i class="stop red-text glyphicon glyphicon-stop"></i>
   </div>
   <div class="time today">
-    {today}
+    <?= $project->today ?>
   </div>
   <div class="time week">
-    {week}
+    <?= $project->week ?>
   </div>
   <div class="time month">
-    {month}
+    <?= $project->month ?>
   </div>
   <div class="time custom">
     &nbsp;

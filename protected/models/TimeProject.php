@@ -16,6 +16,17 @@
  */
 class TimeProject extends CActiveRecord
 {
+
+  public $today;
+  public $week;
+  public $month;
+
+  public function __construct($user_id, $scenario = 'insert')
+  {
+    parent::__construct($scenario);
+    $this->user_id = $user_id;
+  }
+
 	/**
 	 * @return string the associated database table name
 	 */
@@ -32,7 +43,7 @@ class TimeProject extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name, created, user_id', 'required'),
+			array('name, user_id', 'required'),
 			array('status, user_id, cost, cost_type', 'numerical', 'integerOnly'=>true),
 			array('name', 'length', 'max'=>255),
 			array('position', 'length', 'max'=>10),
@@ -115,4 +126,28 @@ class TimeProject extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+  /**
+   * @return mixed
+   */
+  public function getToday()
+  {
+    return $this->today;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getWeek()
+  {
+    return $this->week;
+  }
+
+  /**
+   * @return mixed
+   */
+  public function getMonth()
+  {
+    return $this->month;
+  }
 }

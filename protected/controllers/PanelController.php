@@ -12,10 +12,12 @@ class PanelController extends Controller
      * @var $app CWebApplication
      */
     $app = Yii::app();
+    $uid = $app->user->id;
     if(!$app->user->checkAccess('Panel.*')) {
       $this->redirect($app->createUrl('login'));
     }
-    $timeProjects = array();
+    $timeProjects = TimeProject::model()->findAllByAttributes(array('user_id' => $uid));
+//    $timeProjects = array();
     $timeTracker = $this->renderPartial('time_tracker', array('timeProjects' => $timeProjects), true);
 		$this->render('index', array(
       'timeTracker'=>$timeTracker

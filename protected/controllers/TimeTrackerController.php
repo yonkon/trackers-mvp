@@ -11,7 +11,7 @@ class TimeTrackerController extends Controller
     $app = Yii::app();
     if(!$app->user->isGuest) {
       if(!empty($_REQUEST['timeProject']['name']) ) {
-        $timeProject = new TimeProject();
+        $timeProject = new TimeProject($app->user->id);
         $timeProject->setAttributes($_REQUEST['timeProject']);
         $html = '';
         if($timeProject->validate()) {
