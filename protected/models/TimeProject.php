@@ -13,10 +13,14 @@
  * @property integer $user_id
  * @property integer $cost
  * @property integer $cost_type
+ * @property TimeItem[] $timeItems
  */
 class TimeProject extends CActiveRecord
 {
 
+  const STATUS_STOPPED = 0;
+  const STATUS_STARTED = 1;
+  const STATUS_DELETED = -1;
   public $today;
   public $week;
   public $month;
@@ -25,6 +29,7 @@ class TimeProject extends CActiveRecord
   {
     parent::__construct($scenario);
     $this->user_id = $user_id;
+    $this->status = self::STATUS_STOPPED;
   }
 
 	/**
@@ -62,6 +67,7 @@ class TimeProject extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+      'timeItems' => array(self::HAS_MANY, 'TimeItem', 'time_project_id')
 		);
 	}
 
@@ -150,4 +156,31 @@ class TimeProject extends CActiveRecord
   {
     return $this->month;
   }
+
+  public function stop($upd_time = null)
+  {
+    $this->status=self::STATUS_STOPPED;
+    $this->updated = Helpers::time2mysql_ts($upd_time);
+    $this->save();
+  }
+
+  /**
+   * Returns all column attribute values.
+   * Note, related objects are not returned.
+   * @param mixed $names names of attributes whose value needs to be returned.
+   * If this is true (default), then all attribute values will be returned, including
+   * those that are not loaded from DB (null will be returned for those attributes).
+   * If this is null, all attributes except those that are not loaded from DB will be returned.
+   * @return array attribute values indexed by attribute names.
+   */
+  public function getAttributes($names = true, $intTimestapms = false)
+  {
+    $proj =  parent::getAttributes($names);
+    if(!empty($proj) && $intTimestapms) {
+      $proj['created'] = strtotime($proj['created']);
+      $proj['updated'] = strtotime($proj['updated']);
+    }
+    return $proj;
+  }
+
 }

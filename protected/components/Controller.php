@@ -5,6 +5,9 @@
  */
 class Controller extends RController
 {
+
+  const STATUS_ERROR = 'error';
+  const STATUS_OK = 'OK';
 	/**
 	 * @var string the default layout for the controller view. Defaults to '//layouts/column1',
 	 * meaning using a single column layout. See 'protected/views/layouts/column1.php'.
@@ -40,6 +43,18 @@ class Controller extends RController
     return array(
       'accessControl'
     );
+  }
+
+  public static function jsonAsnwer($data = null, $status = self::STATUS_OK, $message = '', $print = true){
+    $json =  json_encode(array(
+      'status' => $status,
+      'message' => $message,
+      'data' => $data
+    ));
+    if($print) {
+      echo $json;
+    }
+    return $json;
   }
 
 }

@@ -52,8 +52,8 @@ $app = Yii::app();
         <i class="glyphicon glyphicon-time"></i>
         <i class="glyphicon glyphicon-play-circle"></i>
         <? } ?>
-        <i class="start green-text glyphicon glyphicon-play"></i>
-        <i class="stop red-text glyphicon glyphicon-stop"></i>
+        <i class="start <?= $project->status==TimeProject::STATUS_STOPPED? '': 'hidden' ?> green-text glyphicon glyphicon-play"></i>
+        <i class="stop <?= $project->status==TimeProject::STATUS_STARTED? '': 'hidden' ?> red-text glyphicon glyphicon-stop"></i>
       </div>
       <div class="time today">
         <?= $project->today ?>&nbsp;
@@ -82,7 +82,7 @@ $app = Yii::app();
 <script type="text/javascript">
   $(function(){
 
-    $.datepicker.setDefaults($.datepicker.regional['ru'])
+    $.datepicker.setDefaults($.datepicker.regional['ru']);
 
     $('.project-add').click(function(){
       $('#new_project_box').show();
@@ -121,7 +121,7 @@ $app = Yii::app();
           }
         })
           .success(function(data){
-            alert('ok');
+            console.dir(data);
           })
           .error(function(err){
             alert(err.status + ' : ' + err.statusText );
@@ -149,7 +149,7 @@ $app = Yii::app();
         $parent.find('.ok').click();
         return;
       }
-      if(keyCode == 27) {
+      if(keyCode == 27) { //ESCAPE
         $parent.find('.cancel').click();
         return;
       }
@@ -217,7 +217,123 @@ $app = Yii::app();
       $(this).parent().siblings().find('input').datepicker('option', 'minDate' , '');
     });
 
+    $('li.project .start').click(function(){
+      var $this = $(this);
+      var time = Math.floor(Date.now()/1000);
+      var $parent = $this.parents('li');
+      $this.addClass('hidden');
+      $parent.find('.stop').removeClass('hidden');
+      var project = {};
+      project.id = $parent.data('id');
+      project.status = $parent.data('status');
+      $.ajax({
+        url : '<?= $app->createUrl('timeTracker/start') ?>',
+        data : {
+          timeProject : project,
+          timeItem : {start : time}
+        },
+        type : 'post',
+        error : function(e){
+          console.dir(e);
+          $this.removeClass('hidden');
+          $parent.find('.stop').addClass('hidden');
+        },
+        success : function(e){
+          data = e;
+          try {
+            data = JSON.parse(e);
+          } catch (exc){
+            data = e;
+          }
+          if(data && typeof (data.status) != 'undefined' && data.status == "OK") {
+            console.dir(data);
+            var item = data.data.timeItem;
+            var iid = item.id;
+            var start = item.start;
+            var status = item.status;
+            var pid = item.time_project_id;
+            var pkey = 'timeProject['+pid+']';
+//            var ikey = pkey + '[' + iid+']';
+            var strData = localStorage.getItem(pkey);
+            if(typeof strData == 'undefined' || !strData) {
+              objData = {};
+            } else {
+              try{
+                objData = JSON.parse(strData);
+              } catch(exc){
+                objData = {};
+              }
+            }
+            objData[iid] = {
+              start : start,
+              status : status
+            };
+            strData = JSON.stringify(objData);
+            localStorage.setItem(pkey, strData);
+          } else {
+            if(data && typeof (data.message) != 'undefined' && data.message.length) {
+              animatePopup(null, data.message, 'error');
+            }
+              console.dir(data);
+          }
+        }
+      });
+    });
 
+    $('li.project .stop').click(function(){
+      var $this = $(this);
+      var $parent = $this.parents('li');
+      $this.addClass('hidden');
+      $parent.find('.start').removeClass('hidden');
+      var project = {};
+      project.id = $parent.data('id');
+      project.status = $parent.data('status');
+      $.ajax({
+        url : '<?= $app->createUrl('timeTracker/stop') ?>',
+        data : {
+          timeProject : project
+        },
+        error : function(e){
+          console.dir(e);
+          $this.removeClass('hidden');
+          $parent.find('.start').addClass('hidden');
+        },
+        success : function(e){
+          data = e;
+          try {
+            data = JSON.parse(e);
+          } catch (exc) {
+            data = e;
+          }
+          console.dir(data);
+        }
+      });
+    });
 
   });
+
+  function createPopup(message, type) {
+    if('undefined' == typeof type) {
+      type = 'info';
+    }
+    var $flashpopup = $('#flash_popup');
+    if($flashpopup.length) {
+      $flashpopup.removeClass();
+      $flashpopup.addClass(type);
+      $flashpopup.html(message);
+    } else {
+      $flashpopup = $('<div id="flash_popup" class="' + type + '">'+message+"</div>");
+      $flashpopup.appendTo(document.body);
+    }
+    return $flashpopup;
+  }
+
+  function animatePopup($element, message, type) {
+    if(!$element || typeof($element) == 'undefined' || !$element.length) {
+      $element = createPopup(message, type);
+    }
+    $element.fadeIn().animate({opacity: 1.0}, 3000).fadeOut("slow");
+  }
+
+
 </script>

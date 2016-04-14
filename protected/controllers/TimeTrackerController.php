@@ -28,28 +28,56 @@ class TimeTrackerController extends Controller
             )
           ));
         } else {
-          echo json_encode(array(
-              'status' => 'OK',
-              'message' => 'OK',
-              'data' => array(
-                'html' => $html,
-                'project' => $timeProject->getAttributes()
-              )
-            )
-          );
+          $proj = $timeProject->getAttributes(null, true);
+          self::jsonAsnwer(
+            array(
+            'html' => $html,
+            'project' => $proj
+            ),
+            self::STATUS_OK,
+            'OK'
+            );
         }
         die();
       } else {
-        echo json_encode(array(
-          'status' => 'error',
-          'message' => 'Невозможно создать проект без названия',
-        ));
+        self::jsonAsnwer(null, self::STATUS_ERROR, 'Невозможно создать проект без названия' );
       }
     } else {
-      echo json_encode(array(
-        'status' => 'error',
-        'message' => 'Нужна авторизация'
-        ));
+      self::jsonAsnwer(null, self::STATUS_ERROR, 'Нужна авторизация' );
+    }
+    die();
+  }
+
+  public function actionStart(){
+    $item = new TimeItem();
+    $item->setAttributes($_REQUEST['timeItem']);
+    $item->setAttribute('time_project_id', $_REQUEST['timeProject']['id']);
+    $item->start = time();
+    if($item->validate() && $item->save()) {
+      $proj = $item->getAttributes(null, true);
+      $this->jsonAsnwer(array('timeItem' => $proj));
+    } else {
+      $this->jsonAsnwer($item->getErrors(), self::STATUS_ERROR, CHtml::errorSummary($item));
+    }
+    die();
+  }
+
+  public function actionStop()  {
+    $req_iid = intval($_REQUEST['timeItem']['id']);
+    $item = TimeItem::model()->findByPk($req_iid);
+    /**
+     * @var TimeItem $item
+     **/
+    if(!empty($item)){
+      $item->status = $item::STATUS_STOPPED;
+      $item->end = time();
+      if($item->save()) {
+        self::jsonAsnwer($item->getAttributes(null, true));
+      } else {
+        self::jsonAsnwer(null, self::STATUS_ERROR, CHtml::errorSummary($item));
+      }
+    } else {
+      self::jsonAsnwer(null, self::STATUS_ERROR, 'Не удалось найти указанную запись');
     }
     die();
   }
