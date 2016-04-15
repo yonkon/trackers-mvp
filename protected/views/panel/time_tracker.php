@@ -220,12 +220,31 @@ $app = Yii::app();
     $('li.project .start').click(function(){
       var $this = $(this);
       var time = Math.floor(Date.now()/1000);
+      var status = '<?= TimeProject::STATUS_STARTED ?>';
       var $parent = $this.parents('li');
       $this.addClass('hidden');
       $parent.find('.stop').removeClass('hidden');
       var project = {};
       project.id = $parent.data('id');
-      project.status = $parent.data('status');
+      $parent.data('status', status );
+      project.status = status;
+      var pkey = 'timeProject['+project.id+']';
+      var objData = {};
+      var strData = localStorage.getItem(pkey);
+      if(typeof strData == 'undefined' || !strData) {
+        objData = {};
+      } else {
+        try{
+          objData = JSON.parse(strData);
+        } catch(exc){
+          objData = {};
+        }
+      }
+      if(typeof objData['untracked'] == 'undefined') {
+        objData['untracked'] = {};
+      }
+      objData['untracked'][time] = {start : time, status : <?= TimeItem::STATUS_STARTED ?>, id_time_project : project.id};
+      localStorage.setItem(pkey, JSON.stringify(objData));
       $.ajax({
         url : '<?= $app->createUrl('timeTracker/start') ?>',
         data : {
@@ -237,6 +256,7 @@ $app = Yii::app();
           console.dir(e);
           $this.removeClass('hidden');
           $parent.find('.stop').addClass('hidden');
+          $parent.data('status', <?= TimeProject::STATUS_STOPPED ?>);
         },
         success : function(e){
           data = e;
@@ -246,14 +266,14 @@ $app = Yii::app();
             data = e;
           }
           if(data && typeof (data.status) != 'undefined' && data.status == "OK") {
-            console.dir(data);
+//            console.dir(data);
             var item = data.data.timeItem;
             var iid = item.id;
+            $parent.data('item', iid);
             var start = item.start;
             var status = item.status;
             var pid = item.time_project_id;
             var pkey = 'timeProject['+pid+']';
-//            var ikey = pkey + '[' + iid+']';
             var strData = localStorage.getItem(pkey);
             if(typeof strData == 'undefined' || !strData) {
               objData = {};
@@ -264,9 +284,11 @@ $app = Yii::app();
                 objData = {};
               }
             }
+            delete objData['untracked'][start];
             objData[iid] = {
               start : start,
-              status : status
+              status : status,
+              id_time_project : pid
             };
             strData = JSON.stringify(objData);
             localStorage.setItem(pkey, strData);
@@ -281,22 +303,28 @@ $app = Yii::app();
     });
 
     $('li.project .stop').click(function(){
+      var time = Math.floor(Date.now()/1000);
       var $this = $(this);
       var $parent = $this.parents('li');
       $this.addClass('hidden');
       $parent.find('.start').removeClass('hidden');
-      var project = {};
+      var project = {}, item = {};
+      item.id = $parent.data('item');
+      item.end = time;
+      item.start = $parent.data('start');
       project.id = $parent.data('id');
       project.status = $parent.data('status');
       $.ajax({
         url : '<?= $app->createUrl('timeTracker/stop') ?>',
         data : {
-          timeProject : project
+          timeProject : project,
+          timeItem : item
         },
         error : function(e){
           console.dir(e);
           $this.removeClass('hidden');
           $parent.find('.start').addClass('hidden');
+          animatePopup(null, 'Невозможно обработать запрос', 'error');
         },
         success : function(e){
           data = e;
@@ -305,7 +333,38 @@ $app = Yii::app();
           } catch (exc) {
             data = e;
           }
-          console.dir(data);
+          if(data && typeof (data.status) != 'undefined' && data.status == "OK") {
+//            console.dir(data);
+            var item = data.data.timeItem;
+            var iid = item.id;
+            var start = item.start;
+            var status = item.status;
+            var pid = item.time_project_id;
+            var pkey = 'timeProject['+pid+']';
+            var strData = localStorage.getItem(pkey);
+            if(typeof strData == 'undefined' || !strData) {
+              objData = {};
+            } else {
+              try{
+                objData = JSON.parse(strData);
+              } catch(exc){
+                objData = {};
+              }
+            }
+            delete objData['untracked'][start];
+            objData[iid] = {
+              start : start,
+              status : status,
+              id_time_project : pid
+            };
+            strData = JSON.stringify(objData);
+            localStorage.setItem(pkey, strData);
+          } else {
+            if(data && typeof (data.message) != 'undefined' && data.message.length) {
+              animatePopup(null, data.message, 'error');
+            }
+            console.dir(data);
+          }
         }
       });
     });

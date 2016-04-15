@@ -159,6 +159,7 @@ class TimeProject extends CActiveRecord
 
   public function stop($upd_time = null)
   {
+    $this->setIsNewRecord(false);
     $this->status=self::STATUS_STOPPED;
     $this->updated = Helpers::time2mysql_ts($upd_time);
     $this->save();

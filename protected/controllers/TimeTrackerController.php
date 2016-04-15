@@ -70,7 +70,7 @@ class TimeTrackerController extends Controller
      **/
     if(!empty($item)){
       $item->status = $item::STATUS_STOPPED;
-      $item->end = time();
+      $item->end = intval($_REQUEST['timeItem']['end']);
       if($item->save()) {
         self::jsonAsnwer($item->getAttributes(null, true));
       } else {

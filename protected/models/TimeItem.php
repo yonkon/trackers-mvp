@@ -110,8 +110,8 @@ class TimeItem extends CActiveRecord
 
 
   public function save($runValidation=true,$attributes=null) {
-    $start = intval($this->start);
-    $end = intval($this->end);
+    $start = is_numeric($this->start) ? intval($this->start) : strtotime($this->start);
+    $end = is_numeric($this->end) ? intval($this->end) : strtotime($this->end);
     if(!empty($end)) {
       $seconds = $end - $start;
       $this->seconds = $seconds;
