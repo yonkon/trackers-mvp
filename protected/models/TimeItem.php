@@ -8,7 +8,8 @@
  * @property integer $time_project_id
  * @property integer $status
  * @property string $start
- * @property string $end
+ * @property integer $start_int
+ * @property integer $end_int
  * @property integer $seconds
  * @property TimeProject $timeProject
  */
@@ -126,9 +127,11 @@ class TimeItem extends CActiveRecord
     return parent::save($runValidation,$attributes);
   }
 
-  public function afterSave() {
+  public function afterSave2() {
     if($this->status == self::STATUS_STOPPED) {
       $this->timeProject->stop($this->end);
+    } elseif ($this->status == self::STATUS_STARTED) {
+      $this->timeProject->start($this->start);
     }
   }
 
@@ -143,4 +146,52 @@ class TimeItem extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+  public function start()
+  {
+    $this->status = self::STATUS_STARTED;
+    if($this->save()) {
+      return $this->timeProject->start($this->start);
+    }
+    return false;
+  }
+
+  public function stop()
+  {
+    if(empty($this->end)) {
+      $this->end = time();
+    }
+    $this->status = self::STATUS_STOPPED;
+    if($this->save()) {
+      return $this->timeProject->stop();
+    }
+    return false;
+  }
+
+  /**
+   * @return int
+   */
+  public function getStart_int() {
+    return is_numeric($this->start)? intval($this->start) : strtotime($this->start);
+  }
+
+  /**
+   * @return int
+   */
+  public function getEnd_int() {
+    return is_numeric($this->end)? intval($this->end) : strtotime($this->end);
+  }
+
+  public function isStopped()
+  {
+    return ($this->status == self::STATUS_STOPPED);
+  }
+
+  /**
+   * @return int
+   */
+  public function getSeconds()
+  {
+    return $this->isStopped() ? $this->seconds : (time() - $this->start_int);
+  }
 }

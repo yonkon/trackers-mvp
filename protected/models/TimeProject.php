@@ -13,7 +13,14 @@
  * @property integer $user_id
  * @property integer $cost
  * @property integer $cost_type
+ * @property integer $today
+ * @property string $todayFormatted
+ * @property integer $week
+ * @property string $weekFormatted
+ * @property integer $month
+ * @property string $monthFormatted
  * @property TimeItem[] $timeItems
+ * @property TimeItem lastItem
  */
 class TimeProject extends CActiveRecord
 {
@@ -21,9 +28,13 @@ class TimeProject extends CActiveRecord
   const STATUS_STOPPED = 0;
   const STATUS_STARTED = 1;
   const STATUS_DELETED = -1;
-  public $today;
-  public $week;
-  public $month;
+  private $today;
+  private $week;
+  private $month;
+  private $todayFormatted;
+  private $weekFormatted;
+  private $monthFormatted;
+  private $custom;
 
   public function __construct($user_id, $scenario = 'insert')
   {
@@ -32,10 +43,32 @@ class TimeProject extends CActiveRecord
     $this->status = self::STATUS_STOPPED;
   }
 
-	/**
+  public static function getMaxPositionStatic($uid)
+  {
+    $cmd = Yii::app()->db->createCommand('SELECT MAX(`position`) as `position` FROM ' . self::tableNameStatic() .
+      ' WHERE `user_id` = ' . (int)$uid );
+    $res = $cmd->queryScalar();
+    return intval($res);
+
+  }
+
+  public function getMaxPosition()
+  {
+    $cmd = Yii::app()->db->createCommand('SELECT MAX(`position`) FROM ' . $this->tableName() .
+      ' WHERE `user_id` = ' . $this->user_id);
+    $res = $cmd->queryScalar();
+    return intval($res);
+  }
+
+  /**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
+	{
+		return 'time_project';
+	}
+
+	public  static function tableNameStatic()
 	{
 		return 'time_project';
 	}
@@ -133,27 +166,79 @@ class TimeProject extends CActiveRecord
 		return parent::model($className);
 	}
 
+  public function processTimeIntervals($custom_from = null, $custom_to = null)
+  {
+    $today = Helpers::getToday();
+    $tomorrow = Helpers::getTomorrow();
+    $last_week = $tomorrow - Helpers::SECONDS_IN_WEEK;
+    $last_month = $tomorrow - Helpers::SECONDS_IN_MONTH;
+    $total  = 0;
+    $this->today = 0;
+    $this->week = 0;
+    $this->month = 0;
+    $this->custom = 0;
+
+    foreach($this->timeItems as $item) {
+      if($item->start_int < $tomorrow) {
+        $seconds = $item->getSeconds();
+
+        if($item->start_int >= $today) {
+          $this->today += $seconds;
+        }
+
+        if($item->start_int >= $last_week) {
+          $this->week += $seconds;
+        }
+
+        if($item->start_int >= $last_month) {
+          $this->month += $seconds;
+        }
+
+        if((empty($custom_from) || $item->start_int >= $custom_from) &&
+          (empty($custom_to) || $item->end_int <= $custom_to)
+        ) {
+          $this->custom += $seconds;
+        }
+      }
+    }
+    return array(
+      'today' => $this->today,
+      'week' => $this->week,
+      'month' => $this->month,
+      'custom' => $this->custom,
+    );
+  }
+
   /**
    * @return mixed
    */
-  public function getToday()
+  public function getToday($refresh = true)
   {
+    if($refresh || empty($today)) {
+      $this->processTimeIntervals();
+    }
     return $this->today;
   }
 
   /**
    * @return mixed
    */
-  public function getWeek()
+  public function getWeek($refresh = true)
   {
+    if($refresh || empty($week)) {
+      $this->processTimeIntervals();
+    }
     return $this->week;
   }
 
   /**
    * @return mixed
    */
-  public function getMonth()
+  public function getMonth($refresh = true)
   {
+    if($refresh || empty($month)) {
+      $this->processTimeIntervals();
+    }
     return $this->month;
   }
 
@@ -162,7 +247,7 @@ class TimeProject extends CActiveRecord
     $this->setIsNewRecord(false);
     $this->status=self::STATUS_STOPPED;
     $this->updated = Helpers::time2mysql_ts($upd_time);
-    $this->save();
+    return $this->save();
   }
 
   /**
@@ -182,6 +267,53 @@ class TimeProject extends CActiveRecord
       $proj['updated'] = strtotime($proj['updated']);
     }
     return $proj;
+  }
+
+  public function start($time = null)
+  {
+    $this->setIsNewRecord(false);
+    $this->status = self::STATUS_STARTED;
+    $this->updated = Helpers::time2mysql_ts($time);
+    return $this->save();
+  }
+
+  /**
+   * @return string
+   */
+  public function getTodayFormatted()
+  {
+    $this->todayFormatted = Helpers::formatTime($this->getToday());
+    return $this->todayFormatted;
+  }
+  public function getWeekFormatted()
+  {
+    $this->weekFormatted = Helpers::formatTime($this->getWeek());
+    return $this->weekFormatted;
+  }
+  public function getMonthFormatted()
+  {
+    $this->monthFormatted = Helpers::formatTime($this->getMonth());
+    return $this->monthFormatted;
+  }
+
+  /**
+   * @return TimeItem
+   */
+  public function getLastItem()
+  {
+    $last_start = array('index' => -1, 'start' => 0);
+    foreach($this->timeItems as $i => $item) {
+      if($last_start['start'] < $item->start) {
+        $last_start = array('index' => $i, 'start' => $item->start);
+      }
+      if(!$item->isStopped()) {
+        return $item;
+      }
+    }
+    if($last_start['index'] != -1 ) {
+      return $this->timeItems[$last_start['index']];
+    }
+    return null;
   }
 
 }

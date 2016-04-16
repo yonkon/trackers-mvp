@@ -11,8 +11,10 @@ class TimeTrackerController extends Controller
     $app = Yii::app();
     if(!$app->user->isGuest) {
       if(!empty($_REQUEST['timeProject']['name']) ) {
+        $pos = TimeProject::getMaxPositionStatic($app->user->id);
         $timeProject = new TimeProject($app->user->id);
-        $timeProject->setAttributes($_REQUEST['timeProject']);
+        $timeProject->position = $pos+1;
+        $timeProject->setAttributes($_REQUEST['timeProject'], false);
         $html = '';
         if($timeProject->validate()) {
           if($timeProject->save()) {
@@ -50,12 +52,11 @@ class TimeTrackerController extends Controller
 
   public function actionStart(){
     $item = new TimeItem();
-    $item->setAttributes($_REQUEST['timeItem']);
+    $item->setAttributes($_REQUEST['timeItem'], false);
     $item->setAttribute('time_project_id', $_REQUEST['timeProject']['id']);
-    $item->start = time();
-    if($item->validate() && $item->save()) {
-      $proj = $item->getAttributes(null, true);
-      $this->jsonAsnwer(array('timeItem' => $proj));
+    if($item->start()) {
+      $itemAttr = $item->getAttributes(null, true);
+      $this->jsonAsnwer(array('timeItem' => $itemAttr));
     } else {
       $this->jsonAsnwer($item->getErrors(), self::STATUS_ERROR, CHtml::errorSummary($item));
     }
@@ -69,10 +70,10 @@ class TimeTrackerController extends Controller
      * @var TimeItem $item
      **/
     if(!empty($item)){
-      $item->status = $item::STATUS_STOPPED;
       $item->end = intval($_REQUEST['timeItem']['end']);
-      if($item->save()) {
-        self::jsonAsnwer($item->getAttributes(null, true));
+      if($item->stop()) {
+        $itemAttr = $item->getAttributes(null, true);
+        $this->jsonAsnwer(array('timeItem' => $itemAttr));
       } else {
         self::jsonAsnwer(null, self::STATUS_ERROR, CHtml::errorSummary($item));
       }

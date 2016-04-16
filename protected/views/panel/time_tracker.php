@@ -3,6 +3,7 @@
  *
  * @var PanelController $this
  * @var $app CWebApplication
+ * @var $timeProjects TimeProject[]
  */
 $app = Yii::app();
 ?>
@@ -37,7 +38,7 @@ $app = Yii::app();
       </div>
     </li>
     <? foreach($timeProjects as $project) : ?>
-    <li class="project" data-id="<?= $project->id ?>" data-status="<?= $project->status ?>">
+    <li class="project" data-id="<?= $project->id ?>" data-status="<?= $project->status ?>" data-item="<?= $project->lastItem ? $project->lastItem->id : '' ?>">
       <div class="position"><?= $project->position ?></div>
       <div class="name"><span class="value"><?= $project->name ?></span>
         <div class="hid-control">
@@ -56,13 +57,13 @@ $app = Yii::app();
         <i class="stop <?= $project->status==TimeProject::STATUS_STARTED? '': 'hidden' ?> red-text glyphicon glyphicon-stop"></i>
       </div>
       <div class="time today">
-        <?= $project->today ?>&nbsp;
+        <?= $project->todayFormatted ?>&nbsp;
       </div>
       <div class="time week">
-        <?= $project->week ?>&nbsp;
+        <?= $project->weekFormatted ?>&nbsp;
       </div>
       <div class="time month">
-        <?= $project->month ?>&nbsp;
+        <?= $project->monthFormatted ?>&nbsp;
       </div>
       <div class="time custom">
         &nbsp;
@@ -118,18 +119,31 @@ $app = Yii::app();
           },
           beforeSend : function() {
             $('#new_project_loader').show();
-          }
-        })
-          .success(function(data){
-            console.dir(data);
-          })
-          .error(function(err){
-            alert(err.status + ' : ' + err.statusText );
-          })
-          .complete(function(){
+          },
+          success : function(res){
+            data = {};
+            try {
+              data = JSON.parse(res);
+            } catch (exc) {
+              console.dir(exc);
+              console.dir(res);
+            }
+            if(isAjaxGood(data)) {
+              var $newProj = $(data.data.html);
+              $newProj.appendTo($('.pr-list'));
+              animatePopup(null, 'Проект успешно открыт');
+            } else {
+              animateAjaxMessage(data);
+            }
+          },
+          error : function(err){
+            animatePopup(null, err.status + ' : ' + err.statusText, 'error' );
+          },
+          complete : function(){
             $('#new_project_loader').hide();
             $('#new_project_box').hide();
-          });
+          }
+        });
       }
     );
 
@@ -227,6 +241,7 @@ $app = Yii::app();
       var project = {};
       project.id = $parent.data('id');
       $parent.data('status', status );
+      $parent.data('start', time );
       project.status = status;
       var pkey = 'timeProject['+project.id+']';
       var objData = {};
@@ -265,7 +280,7 @@ $app = Yii::app();
           } catch (exc){
             data = e;
           }
-          if(data && typeof (data.status) != 'undefined' && data.status == "OK") {
+          if(isAjaxGood(data)) {
 //            console.dir(data);
             var item = data.data.timeItem;
             var iid = item.id;
@@ -284,8 +299,11 @@ $app = Yii::app();
                 objData = {};
               }
             }
-            delete objData['untracked'][start];
+            if(typeof objData['untracked'] != 'undefined') {
+              delete objData['untracked'][start];
+            }
             objData[iid] = {
+              id : iid,
               start : start,
               status : status,
               id_time_project : pid
@@ -293,9 +311,7 @@ $app = Yii::app();
             strData = JSON.stringify(objData);
             localStorage.setItem(pkey, strData);
           } else {
-            if(data && typeof (data.message) != 'undefined' && data.message.length) {
-              animatePopup(null, data.message, 'error');
-            }
+            animateAjaxMessage(data)
               console.dir(data);
           }
         }
@@ -310,6 +326,7 @@ $app = Yii::app();
       $parent.find('.start').removeClass('hidden');
       var project = {}, item = {};
       item.id = $parent.data('item');
+      $parent.data('item', '');
       item.end = time;
       item.start = $parent.data('start');
       project.id = $parent.data('id');
@@ -333,7 +350,7 @@ $app = Yii::app();
           } catch (exc) {
             data = e;
           }
-          if(data && typeof (data.status) != 'undefined' && data.status == "OK") {
+          if(isAjaxGood(data)) {
 //            console.dir(data);
             var item = data.data.timeItem;
             var iid = item.id;
@@ -351,18 +368,21 @@ $app = Yii::app();
                 objData = {};
               }
             }
-            delete objData['untracked'][start];
+            if(objData && typeof objData['untracked'] != 'undefined') {
+              delete objData['untracked'][start];
+            }
             objData[iid] = {
+              id : iid,
               start : start,
               status : status,
-              id_time_project : pid
+              id_time_project : pid,
+              end : item.end,
+              seconds : item.seconds
             };
             strData = JSON.stringify(objData);
             localStorage.setItem(pkey, strData);
           } else {
-            if(data && typeof (data.message) != 'undefined' && data.message.length) {
-              animatePopup(null, data.message, 'error');
-            }
+            animateAjaxMessage(data)
             console.dir(data);
           }
         }
@@ -394,5 +414,22 @@ $app = Yii::app();
     $element.fadeIn().animate({opacity: 1.0}, 3000).fadeOut("slow");
   }
 
+  function animateAjaxMessage(data) {
+    if(hasAjaxMessage(data)) {
+      var type = 'error';
+      if(typeof data.status != 'undefined') {
+        type = data.status;
+      }
+      animatePopup(null, data.message, type);
+    }
+  }
+
+  function isAjaxGood(parsed) {
+      return (parsed && typeof (parsed.status) != 'undefined' && parsed.status == "OK");
+  }
+
+  function hasAjaxMessage(parsed) {
+    return (parsed && typeof (parsed.message) != 'undefined' && parsed.message.length);
+  }
 
 </script>

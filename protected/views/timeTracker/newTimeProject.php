@@ -23,16 +23,16 @@ $app = Yii::app();
       <i class="glyphicon glyphicon-play-circle"></i>
     <? } ?>
     <i class="start green-text glyphicon glyphicon-play"></i>
-    <i class="stop red-text glyphicon glyphicon-stop"></i>
+    <i class="stop hidden red-text glyphicon glyphicon-stop"></i>
   </div>
   <div class="time today">
-    <?= $project->today ?>
+    <?= $project->today ?>&nbsp;
   </div>
   <div class="time week">
-    <?= $project->week ?>
+    <?= $project->week ?>&nbsp;
   </div>
   <div class="time month">
-    <?= $project->month ?>
+    <?= $project->month ?>&nbsp;
   </div>
   <div class="time custom">
     &nbsp;
