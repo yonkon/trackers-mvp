@@ -16,7 +16,13 @@ class PanelController extends Controller
     if(!$app->user->checkAccess('Panel.*')) {
       $this->redirect($app->createUrl('login'));
     }
-    $timeProjects = TimeProject::model()->findAllByAttributes(array('user_id' => $uid));
+    $timeProjects = TimeProject::model()->findAllByAttributes(
+      array('user_id' => $uid),
+      array(
+        'condition'=>'status!=:status',
+        'params'=>array('status'=>TimeProject::STATUS_DELETED)
+        )
+    );
 //    $timeProjects = array();
     $timeTracker = $this->renderPartial('time_tracker', array('timeProjects' => $timeProjects), true);
 		$this->render('index', array(

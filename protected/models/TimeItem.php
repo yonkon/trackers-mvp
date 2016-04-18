@@ -9,6 +9,7 @@
  * @property integer $status
  * @property string $start
  * @property integer $start_int
+ * @property string $end
  * @property integer $end_int
  * @property integer $seconds
  * @property TimeProject $timeProject
@@ -147,8 +148,14 @@ class TimeItem extends CActiveRecord
 		return parent::model($className);
 	}
 
-  public function start()
+  public function start($time = null)
   {
+    if(!empty($time)) {
+      $this->start = $time;
+    }
+    if(empty($this->start)) {
+      $this->start = time();
+    }
     $this->status = self::STATUS_STARTED;
     if($this->save()) {
       return $this->timeProject->start($this->start);
@@ -156,8 +163,11 @@ class TimeItem extends CActiveRecord
     return false;
   }
 
-  public function stop()
+  public function stop($time = null)
   {
+    if(!empty($time)) {
+      $this->end = $time;
+    }
     if(empty($this->end)) {
       $this->end = time();
     }
@@ -193,5 +203,14 @@ class TimeItem extends CActiveRecord
   public function getSeconds()
   {
     return $this->isStopped() ? $this->seconds : (time() - $this->start_int);
+  }
+
+  public function disable()
+  {
+    $this->status = self::STATUS_STOPPED;
+    if(empty($this->end)) {
+      $this->end = time();
+    }
+    $this->save();
   }
 }

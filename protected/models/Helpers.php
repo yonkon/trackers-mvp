@@ -39,6 +39,7 @@ class Helpers
   }
 
   public static function formatTime($time, $format = null) {
+
     if(!empty($format)) {
       return gmdate($format, $time);
     }
@@ -49,9 +50,9 @@ class Helpers
       return gmdate('H ч. i мин.', $time);
     }
     if($time<self::SECONDS_IN_WEEK) {
-      return gmdate('d дн. H ч.');
+      return gmdate('d дн. H ч.', $time);
     }
-    return gmdate('w нед. d дн. H ч.');
+    return gmdate('w нед. d дн. H ч.', $time);
   }
 
 

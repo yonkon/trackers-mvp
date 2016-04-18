@@ -50,8 +50,38 @@ class TimeTrackerController extends Controller
     die();
   }
 
+  public function actionDelete() {
+    $app = Yii::app();
+    if(!empty($_REQUEST['id'])) {
+      $id = intval($_REQUEST['id']);
+      $proj = TimeProject::model()->findByPk($id);
+
+      /** @var TimeProject $proj */
+      if(empty($proj)) {
+        $this->jsonAsnwer(array('id'=>$id), self::STATUS_ERROR, "Невозможно найти запись" );
+      } else {
+        if(!$app->user->isAdmin() && $proj->user_id != $app->user->id) {
+          $this->jsonAsnwer(array('id'=>$id), self::STATUS_ERROR, "У Вас нет прав на удаление этой записи" );
+        } else {
+          if($proj->disable()) {
+            $this->jsonAsnwer(array('id'=>$id), self::STATUS_OK, "Запись успешно удалена" );
+          } else {
+            $this->jsonAsnwer(array('id'=>$id), self::STATUS_ERROR, "Невозможно удалить запись" );
+          }
+        }
+      }
+    }
+    die();
+  }
+
   public function actionStart(){
-    $item = new TimeItem();
+    $item = TimeItem::model()->findByAttributes(array(
+      'time_project_id' => intval($_REQUEST['timeProject']['id']),
+      'start' => Helpers::time2mysql_ts($_REQUEST['timeItem']['start'])
+    ));
+    if(empty($item)) {
+      $item = new TimeItem();
+    }
     $item->setAttributes($_REQUEST['timeItem'], false);
     $item->setAttribute('time_project_id', $_REQUEST['timeProject']['id']);
     if($item->start()) {
@@ -65,11 +95,19 @@ class TimeTrackerController extends Controller
 
   public function actionStop()  {
     $req_iid = intval($_REQUEST['timeItem']['id']);
-    $item = TimeItem::model()->findByPk($req_iid);
+    $item = array();
+    if($req_iid) {
+      $item = TimeItem::model()->findByPk($req_iid);
+    } elseif(!empty($_REQUEST['timeProject']['id']) && !empty($_REQUEST['timeItem']['start']) ) {
+      $item = TimeItem::model()->findByAttributes(array(
+        'time_project_id' => intval($_REQUEST['timeProject']['id']),
+        'start' => Helpers::time2mysql_ts($_REQUEST['timeItem']['start'])
+      ));
+    }
     /**
      * @var TimeItem $item
      **/
-    if(!empty($item)){
+    if(!empty($item)) {
       $item->end = intval($_REQUEST['timeItem']['end']);
       if($item->stop()) {
         $itemAttr = $item->getAttributes(null, true);

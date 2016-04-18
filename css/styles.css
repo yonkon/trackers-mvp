@@ -216,8 +216,8 @@ li.project.header {
 }
 
 li.project .time {
-  width: 108px;
-  margin-left: 32px;
+  width: 120px;
+  margin-left: 20px;
   background: #C3D9FF;
   box-shadow: 0 0 0px 2px #c3d9ff;
   text-align: center;
@@ -314,3 +314,6 @@ div#flash_popup.error {
   border-radius: 0 0 10px 10px;
 }
 
+.name .delete {
+  margin-left: 6px;
+}

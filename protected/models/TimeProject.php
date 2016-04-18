@@ -316,4 +316,13 @@ class TimeProject extends CActiveRecord
     return null;
   }
 
+  public function disable()
+  {
+    $this->status = self::STATUS_DELETED;
+    foreach ($this->timeItems as $item ) {
+      $item->disable();
+    }
+    return $this->save();
+  }
+
 }

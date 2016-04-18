@@ -9,12 +9,14 @@ $app = Yii::app();
 ?>
 <li class="project" data-id="<?= $project->id ?>" data-status="<?= $project->status ?>">
   <div class="position"><?= $project->position ?></div>
-  <div class="name"><?= $project->name ?>
+  <div class="name">
+    <span class="value"><?= $project->name ?></span>
     <div class="hid-control">
       <input>
       <i class="ok glyphicon glyphicon-ok"></i>
       <i class="cancel glyphicon glyphicon-remove"></i>
     </div>
+    <i class="delete right glyphicon glyphicon-remove"></i>
     <i class="edit right glyphicon glyphicon-pencil"></i>
   </div>
   <div class="controls">
