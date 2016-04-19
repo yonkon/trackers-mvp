@@ -40,6 +40,7 @@
   <link rel="stylesheet" href="/js/fancybox/source/jquery.fancybox.css" type="text/css" media="screen" />
   <script type="text/javascript" src="/js/fancybox/source/jquery.fancybox.js"></script>
 
+  <script type="text/javascript" src="/js/script.js"></script>
   <link rel="stylesheet" href="/css/content_only.css" type="text/css" media="all" />
 
 </head>

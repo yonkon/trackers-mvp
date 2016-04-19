@@ -57,13 +57,13 @@ $app = Yii::app();
         <i class="start <?= $project->status==TimeProject::STATUS_STOPPED? '': 'hidden' ?> green-text glyphicon glyphicon-play"></i>
         <i class="stop <?= $project->status==TimeProject::STATUS_STARTED? '': 'hidden' ?> red-text glyphicon glyphicon-stop"></i>
       </div>
-      <div class="time today">
+      <div class="time today" data-value="<?= $project->today ?>" >
         <?= $project->todayFormatted ?>&nbsp;
       </div>
-      <div class="time week">
+      <div class="time week" data-value="<?= $project->week ?>">
         <?= $project->weekFormatted ?>&nbsp;
       </div>
-      <div class="time month">
+      <div class="time month" data-value="<?= $project->month ?>">
         <?= $project->monthFormatted ?>&nbsp;
       </div>
       <div class="time custom">
@@ -175,8 +175,27 @@ $app = Yii::app();
       var $this = $(this).parent();
       $this.find('#custom_date_value').slideToggle('fast');
     });
+    $('#date_from').click(function(){
+      projectDatepicker('#date_from');
+    });
+
+    $('#date_to').click(function(){
+      projectDatepicker('#date_to');
+    });
 
     initTimeProjectButtons();
+
+    window.timeProjectsLoop = setInterval(function(){
+      $('li.project .time').each(function(i, el){
+        var $this = $(this);
+        $proj = $this.parents('li');
+        if($proj.data('status') == <?= TimeProject::STATUS_STARTED?>) {
+          seconds = parseInt($this.data('value')) + 1;
+          $this.data('value', seconds);
+          $this.text(seconds2Time(seconds));
+        }
+      });
+    }, 1000);
 
   });
 
@@ -280,13 +299,7 @@ $app = Yii::app();
       $parent.find('.edit').show();
     });
 
-    $('#date_from').click(function(){
-      projectDatepicker('#date_from');
-    });
 
-    $('#date_to').click(function(){
-      projectDatepicker('#date_to');
-    });
 
     $('#custom_date_value .glyphicon-remove').click(function(){
       $(this).parent().find('input').val('');

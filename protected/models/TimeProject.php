@@ -325,4 +325,8 @@ class TimeProject extends CActiveRecord
     return $this->save();
   }
 
+  public function getIsNewRecord() {
+    return !isset($this->primaryKey);
+  }
+
 }
