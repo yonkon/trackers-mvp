@@ -31,10 +31,12 @@ class TimeProject extends CActiveRecord
   private $today;
   private $week;
   private $month;
+  private $custom;
+
   private $todayFormatted;
   private $weekFormatted;
   private $monthFormatted;
-  private $custom;
+  private $customFormatted;
 
   public function __construct($user_id, $scenario = 'insert')
   {
@@ -194,18 +196,20 @@ class TimeProject extends CActiveRecord
           $this->month += $seconds;
         }
 
-        if((empty($custom_from) || $item->start_int >= $custom_from) &&
-          (empty($custom_to) || $item->end_int <= $custom_to)
+        if((empty($custom_from) || $item->start_int >= $custom_from && $item->end_int >= $custom_from) &&
+          (empty($custom_to) || $item->end_int <= $custom_to && $item->start_int <= $custom_to)
         ) {
           $this->custom += $seconds;
         }
       }
+      $total += $seconds;
     }
     return array(
       'today' => $this->today,
       'week' => $this->week,
       'month' => $this->month,
       'custom' => $this->custom,
+      'total' => $total,
     );
   }
 
@@ -214,7 +218,7 @@ class TimeProject extends CActiveRecord
    */
   public function getToday($refresh = true)
   {
-    if($refresh || empty($today)) {
+    if($refresh || empty($this->today)) {
       $this->processTimeIntervals();
     }
     return $this->today;
@@ -225,7 +229,7 @@ class TimeProject extends CActiveRecord
    */
   public function getWeek($refresh = true)
   {
-    if($refresh || empty($week)) {
+    if($refresh || empty($this->week)) {
       $this->processTimeIntervals();
     }
     return $this->week;
@@ -236,10 +240,18 @@ class TimeProject extends CActiveRecord
    */
   public function getMonth($refresh = true)
   {
-    if($refresh || empty($month)) {
+    if($refresh || empty($this->month)) {
       $this->processTimeIntervals();
     }
     return $this->month;
+  }
+
+  public function getCustom($from = null, $to = null, $refresh = false)
+  {
+    if($refresh || !isset($this->custom) || !empty($from) || !empty($to)) {
+      $this->processTimeIntervals($from, $to);
+    }
+    return $this->custom;
   }
 
   public function stop($upd_time = null)
@@ -294,6 +306,11 @@ class TimeProject extends CActiveRecord
   {
     $this->monthFormatted = Helpers::formatTime($this->getMonth());
     return $this->monthFormatted;
+  }
+  public function getCustomFormatted()
+  {
+    $this->customFormatted = Helpers::formatTime($this->getCustom());
+    return $this->customFormatted;
   }
 
   /**

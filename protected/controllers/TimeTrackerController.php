@@ -74,6 +74,26 @@ class TimeTrackerController extends Controller
     die();
   }
 
+  public function actionUpdate() {
+    $pid = intval($_REQUEST['id']);
+    /**
+     * @var $project TimeProject
+     */
+    $project = TimeProject::model()->findByPk( $pid );
+    if(empty($project)) {
+      $this->jsonAsnwer(array('id' => $pid), self::STATUS_ERROR, "Не удалось найти проект");
+    } else {
+      $project->setAttributes($_REQUEST['attributes'], true);
+      if($project->validate() && $project->save()) {
+        $projectAttr = $project->getAttributes(null, true);
+        $this->jsonAsnwer(array('timeProject' => $projectAttr));
+      } else {
+        $this->jsonAsnwer($project->getErrors(), self::STATUS_ERROR, CHtml::errorSummary($project));
+      }
+    }
+    die();
+  }
+
   public function actionStart(){
     $item = TimeItem::model()->findByAttributes(array(
       'time_project_id' => intval($_REQUEST['timeProject']['id']),
@@ -120,6 +140,45 @@ class TimeTrackerController extends Controller
     }
     die();
   }
+
+  public function actionGetCustomTime()  {
+    $app = Yii::app();
+    $from = empty($_REQUEST['from']) ? 0 : strtotime($_REQUEST['from']);
+    $to = empty($_REQUEST['to']) ? time() : strtotime($_REQUEST['to']);
+    if(!empty($to)) {
+      $to += Helpers::SECONDS_IN_DAY;
+    }
+    $uid = $app->user->id;
+    $result = array();
+    $timeProjects = TimeProject::model()->with('timeItems')->findAllByAttributes(
+      array('user_id' => $uid),
+      array(
+        'condition'=>'t.status!=:status',
+        'params'=>array('status'=>TimeProject::STATUS_DELETED)
+      )
+    );
+    if(!empty($timeProjects)) {
+      foreach($timeProjects as $tp) {
+        /**
+         * @var $tp TimeProject
+         */
+        $tp->processTimeIntervals($from, $to);
+        $result[$tp->id] = array(
+          'id' => $tp->id,
+          'seconds' => $tp->custom,
+          'custom' => $tp->customFormatted,
+        );
+      }
+
+        $this->jsonAsnwer(array('timeProjects' => $result));
+    } else {
+      self::jsonAsnwer(null, self::STATUS_ERROR, 'Не удалось найти активные проекты');
+    }
+    die();
+  }
+
+
+
 
   public function filters()
   {

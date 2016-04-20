@@ -186,7 +186,7 @@ li.project>div {
 }
 
 .red-text {
-  color: red;
+  color: #e01010;
 }
 
 li.project .controls i, .name i {
@@ -316,4 +316,9 @@ div#flash_popup.error {
 
 .name .delete {
   margin-left: 6px;
+}
+
+.submit-controls {
+  font-size: 25px;
+  letter-spacing: 5px;
 }

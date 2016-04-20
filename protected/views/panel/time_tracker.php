@@ -22,17 +22,24 @@ $app = Yii::app();
       <div class="time">Week</div>
       <div class="time">Month</div>
       <div class="time calendar">
-        <i class="glyphicon glyphicon-calendar"></i>Custom
+        <i class="glyphicon glyphicon-calendar"></i><span class="tip">
+          За всё время
+        </span>
         <div id="custom_date_value">
+
           <div>
             <label for="date_from">С</label>
             <input name="date_from" id="date_from">
-            <i class="glyphicon glyphicon-remove red-text"></i>
+            <i class="glyphicon glyphicon-remove red-text" title="Очистить значение"></i>
           </div>
           <div>
             <label for="date_to">по</label>
             <input name="date_to" id="date_to">
-            <i class="glyphicon glyphicon-remove red-text"></i>
+            <i class="glyphicon glyphicon-remove red-text" title="Очистить значение"></i>
+          </div>
+          <div class="submit-controls">
+            <span class="submit" title="OK"><i class="glyphicon glyphicon-ok-circle green-text"></i></span>
+            <span class="cancel" title="Отмена"><i class="glyphicon glyphicon-remove-circle red-text"></i></span>
           </div>
         </div>
       </div>
@@ -46,7 +53,7 @@ $app = Yii::app();
           <i class="ok glyphicon glyphicon-ok"></i>
           <i class="cancel glyphicon glyphicon-remove"></i>
         </div>
-        <i class="delete right glyphicon glyphicon-remove"></i>
+        <i class="delete right glyphicon glyphicon-trash"></i>
         <i class="edit right glyphicon glyphicon-pencil"></i>
       </div>
       <div class="controls">
@@ -66,8 +73,8 @@ $app = Yii::app();
       <div class="time month" data-value="<?= $project->month ?>">
         <?= $project->monthFormatted ?>&nbsp;
       </div>
-      <div class="time custom">
-        &nbsp;
+      <div class="time custom" data-value="<?= $project->custom ?>">
+        <?= $project->customFormatted ?>&nbsp;
       </div>
     </li>
     <? endforeach; ?>
@@ -183,16 +190,143 @@ $app = Yii::app();
       projectDatepicker('#date_to');
     });
 
+    $('#custom_date_value .submit').click(function(){
+      var from = $('#date_from').val();
+      var to = $('#date_to').val();
+      $.ajax({
+        url : '<?= $app->createUrl('timeTracker/getCustomTime') ?>',
+        data : {
+          from : from,
+          to : to
+        },
+        error : function(e) {
+          animatePopup(null, 'Не удалось получить данные с сервера');
+          console.dir(e);
+        },
+        success : function (res) {
+          try {
+            data = JSON.parse(res);
+            if(isAjaxGood(data)) {
+              $.each(data.data.timeProjects, function(i, el) {
+                var pid = el.id;
+                var $timeDiv = $('li.project[data-id='+pid+'] .time.custom');
+                $timeDiv.data('value', el.seconds);
+                $timeDiv.text( el.custom);
+              });
+              var infoCustom = '';
+              if(from == to) {
+                infoCustom = (to ? 'За ' + to.substr(0,5) : 'За всё время');
+              } else {
+                infoCustom =
+                  (from ? from.substr(0,5) : ' \u2026 ') +
+                  ' - ' +
+                  (to ? to.substr(0,5) : ' \u2026 ');
+              }
+              $('.time.calendar .tip').text(infoCustom);
+            }
+            animateAjaxMessage((data));
+          } catch (exc) {
+            console.dir(exc);
+            console.dir(res);
+          }
+
+        }
+      });
+      $('.time.calendar>i.glyphicon-calendar').click();
+    });
+
+    $('#custom_date_value .cancel').click(function(){
+      $('#date_from').val('');
+      $('#date_to').val('');
+      $.ajax({
+        url : '<?= $app->createUrl('timeTracker/getCustomTime') ?>',
+        data : {
+          from : null,
+          to : null
+        },
+        error : function(e) {
+          animatePopup(null, 'Не удалось получить данные с сервера');
+          console.dir(e);
+        },
+        success : function (res) {
+          try {
+            data = JSON.parse(res);
+            if(isAjaxGood(data)) {
+              $.each(data.data.timeProjects, function(i, el) {
+                var pid = el.id;
+                var $timeDiv = $('li.project[data-id='+pid+'] .time.custom');
+                $timeDiv.data('value', el.seconds);
+                $timeDiv.text( el.custom);
+              });
+              var infoCustom = '';
+              if(from == to) {
+                infoCustom = (to ? 'За ' + to.substr(0,5) : 'За всё время');
+              } else {
+                infoCustom =
+                  (from ? from.substr(0,5) : ' \u2026 ') +
+                  ' - ' +
+                  (to ? to.substr(0,5) : ' \u2026 ');
+              }
+              $('.time.calendar .tip').text(infoCustom);
+            }
+            animateAjaxMessage((data));
+          } catch (exc) {
+            console.dir(exc);
+            console.dir(res);
+          }
+        }
+      });
+      $('.time.calendar>i.glyphicon-calendar').click();
+    });
+
+    $('#custom_date_value input').keyup(function (e) {
+      if($('#ui-datepicker-div').is(':visible')) {
+        return;
+      }
+      var keyCode = e.which;
+      var $parent = $('#custom_date_value');
+      if(keyCode == 13) { //ENTER
+        $parent.find('.submit').click();
+        return;
+      }
+      if(keyCode == 27) { //ESCAPE
+        $parent.find('.cancel').click();
+        return;
+      }
+    });
+
     initTimeProjectButtons();
 
     window.timeProjectsLoop = setInterval(function(){
-      $('li.project .time').each(function(i, el){
-        var $this = $(this);
-        $proj = $this.parents('li');
+      $('li.project').each(function(i, el){
+        var $proj = $(this),
+          pid = $proj.data('id'),
+          pkey = 'timeProject['+pid+']';
         if($proj.data('status') == <?= TimeProject::STATUS_STARTED?>) {
-          seconds = parseInt($this.data('value')) + 1;
-          $this.data('value', seconds);
-          $this.text(seconds2Time(seconds));
+          var pSeconds = parseInt($proj.data('seconds')) + 1;
+          if ($.isNumeric(pSeconds)) {
+            $proj.data('seconds', pSeconds);
+          }
+//            var item = $proj.data('item');
+//            if($.isNumeric(item)) {
+//              strData = localStorage.getItem(pkey);
+//              try {
+//                objData = JSON.parse(strData);
+//              } catch (exc) {
+//                objData = false;
+//              }
+//              if(objData) {
+//                objData[item]
+//              }
+//            }
+          $proj.find('.time').each(function (i2, el2) {
+            var $this = $(this);
+            seconds = parseInt($this.data('value')) + 1;
+            if ($.isNumeric(seconds)) {
+              $this.data('value', seconds);
+              $this.text(seconds2Time(seconds));
+            }
+          });
         }
       });
     }, 1000);
@@ -206,6 +340,7 @@ $app = Yii::app();
       $parent.find('.hid-control input').val($parent.text().trim());
       $parent.find('.hid-control').show();
       $this.hide();
+      $parent.find('.delete').hide();
       $parent.find('.hid-control input').focus();
     });
 
@@ -268,27 +403,28 @@ $app = Yii::app();
           id : $this.parents('li').data('id'),
           attributes : {
             name : newName
-          },
-          success : function(res){
-            data = {};
-            try {
-              data = JSON.parse(res);
-            } catch (exc) {
-              console.dir(exc);
-              console.dir(res);
-            }
-            animateAjaxMessage(data);
-            if(isAjaxGood(data)) {
-              $parent.find('.value').text(newName);
-            }
-          },
-          error : function(e) {
-            animatePopup(null, 'Невозможно переименовать проект', 'error');
           }
+        },
+        success : function(res){
+          data = {};
+          try {
+            data = JSON.parse(res);
+          } catch (exc) {
+            console.dir(exc);
+            console.dir(res);
+          }
+          animateAjaxMessage(data);
+          if(isAjaxGood(data)) {
+            $parent.find('.value').text(newName);
+          }
+        },
+        error : function(e) {
+          animatePopup(null, 'Невозможно переименовать проект', 'error');
         }
       });
       $controls.hide();
       $parent.find('.edit').show();
+      $parent.find('.delete').show();
     });
 
     $('.name .cancel').click(function(){
@@ -445,7 +581,9 @@ $app = Yii::app();
       item.start = start;
       item.status = <?= TimeItem::STATUS_STOPPED?>;
       project.id = pid;
-      project.status = $parent.data('status'); //if start fired right after stop status will be TimeProject::STATUS_STARTED
+      $parent.data('status', item.status);
+      project.status = item.status; //if start fired right after stop status will be TimeProject::STATUS_STARTED
+//      project.status = $parent.data('status'); //if start fired right after stop status will be TimeProject::STATUS_STARTED
       if(!item.id) { //if stop fired right after stop there will be empty id, so write end time to localStorage
         var strData = localStorage.getItem(pkey);
         if(typeof strData == 'undefined' || !strData) {

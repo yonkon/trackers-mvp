@@ -16,10 +16,10 @@ class PanelController extends Controller
     if(!$app->user->checkAccess('Panel.*')) {
       $this->redirect($app->createUrl('login'));
     }
-    $timeProjects = TimeProject::model()->findAllByAttributes(
+    $timeProjects = TimeProject::model()->with('timeItems')->findAllByAttributes(
       array('user_id' => $uid),
       array(
-        'condition'=>'status!=:status',
+        'condition'=>'t.status!=:status',
         'params'=>array('status'=>TimeProject::STATUS_DELETED)
         )
     );

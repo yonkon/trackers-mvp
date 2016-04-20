@@ -182,14 +182,16 @@ class TimeItem extends CActiveRecord
    * @return int
    */
   public function getStart_int() {
-    return is_numeric($this->start)? intval($this->start) : strtotime($this->start);
+    $res = is_numeric($this->start)? intval($this->start) : strtotime($this->start);
+    return  $res;
   }
 
   /**
    * @return int
    */
   public function getEnd_int() {
-    return is_numeric($this->end)? intval($this->end) : strtotime($this->end);
+    $res = is_numeric($this->end)? intval($this->end) : strtotime($this->end);
+    return $res;
   }
 
   public function isStopped()
