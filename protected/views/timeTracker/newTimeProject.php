@@ -28,15 +28,15 @@ $app = Yii::app();
     <i class="stop hidden red-text glyphicon glyphicon-stop"></i>
   </div>
   <div class="time today">
-    <?= $project->todayFormatted ?>&nbsp;
+    <span class="value"><?= $project->todayFormatted ?></span>&nbsp;
   </div>
   <div class="time week">
-    <?= $project->weekFormatted ?>&nbsp;
+    <span class="value"><?= $project->weekFormatted ?></span>&nbsp;
   </div>
   <div class="time month">
-    <?= $project->monthFormatted ?>&nbsp;
+    <span class="value"><?= $project->monthFormatted ?></span>&nbsp;
   </div>
   <div class="time custom">
-    <?= $project->customFormatted ?>&nbsp;
+    <span class="value"><?= $project->customFormatted ?></span>&nbsp;
   </div>
 </li>

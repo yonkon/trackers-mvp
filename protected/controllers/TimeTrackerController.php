@@ -94,6 +94,16 @@ class TimeTrackerController extends Controller
     die();
   }
 
+  public function actionUpdateToday() {
+    $pid = intval($_REQUEST['id']);
+    $hours = intval($_REQUEST['hours']);
+    $minutes = intval($_REQUEST['minutes']);
+    $from = intval($_REQUEST['from']);
+    $to = intval($_REQUEST['to']);
+    $proj = TimeProject::model()->findByPk($pid);
+
+  }
+
   public function actionStart(){
     $item = TimeItem::model()->findByAttributes(array(
       'time_project_id' => intval($_REQUEST['timeProject']['id']),
@@ -150,6 +160,7 @@ class TimeTrackerController extends Controller
     }
     $uid = $app->user->id;
     $result = array();
+
     $timeProjects = TimeProject::model()->with('timeItems')->findAllByAttributes(
       array('user_id' => $uid),
       array(
@@ -162,6 +173,7 @@ class TimeTrackerController extends Controller
         /**
          * @var $tp TimeProject
          */
+        $tp->splitItemsByDays();
         $tp->processTimeIntervals($from, $to);
         $result[$tp->id] = array(
           'id' => $tp->id,
@@ -176,9 +188,6 @@ class TimeTrackerController extends Controller
     }
     die();
   }
-
-
-
 
   public function filters()
   {

@@ -65,16 +65,20 @@ $app = Yii::app();
         <i class="stop <?= $project->status==TimeProject::STATUS_STARTED? '': 'hidden' ?> red-text glyphicon glyphicon-stop"></i>
       </div>
       <div class="time today" data-value="<?= $project->today ?>" >
-        <?= $project->todayFormatted ?>&nbsp;
+        <span class="value"><?= $project->todayFormatted ?></span>&nbsp;
+        <i class="edit glyphicon glyphicon-pencil"></i>
+        <i class="ok glyphicon glyphicon-ok" style="display: none"></i>
+        <div class="controls"><input class="hours" maxlength="4" value=""><span>ч.</span><input maxlength="2" class="minutes"><span>мин.</span></div>
       </div>
       <div class="time week" data-value="<?= $project->week ?>">
-        <?= $project->weekFormatted ?>&nbsp;
+        <span class="value"><?= $project->weekFormatted ?></span>&nbsp;
       </div>
       <div class="time month" data-value="<?= $project->month ?>">
-        <?= $project->monthFormatted ?>&nbsp;
+        <span class="value"><?= $project->monthFormatted ?></span>&nbsp;
       </div>
       <div class="time custom" data-value="<?= $project->custom ?>">
-        <?= $project->customFormatted ?>&nbsp;
+        <span class="value"><?= $project->customFormatted ?></span>&nbsp;
+        <i class="edit glyphicon glyphicon-pencil"></i>
       </div>
     </li>
     <? endforeach; ?>
@@ -211,7 +215,7 @@ $app = Yii::app();
                 var pid = el.id;
                 var $timeDiv = $('li.project[data-id='+pid+'] .time.custom');
                 $timeDiv.data('value', el.seconds);
-                $timeDiv.text( el.custom);
+                $timeDiv.find('.value').text( el.custom);
               });
               var infoCustom = '';
               if(from == to) {
@@ -256,7 +260,7 @@ $app = Yii::app();
                 var pid = el.id;
                 var $timeDiv = $('li.project[data-id='+pid+'] .time.custom');
                 $timeDiv.data('value', el.seconds);
-                $timeDiv.text( el.custom);
+                $timeDiv.find('.value').text( el.custom);
               });
               var infoCustom = '';
               if(from == to) {
@@ -324,7 +328,7 @@ $app = Yii::app();
             seconds = parseInt($this.data('value')) + 1;
             if ($.isNumeric(seconds)) {
               $this.data('value', seconds);
-              $this.text(seconds2Time(seconds));
+              $this.find('.value').text(seconds2Time(seconds));
             }
           });
         }
@@ -332,6 +336,37 @@ $app = Yii::app();
     }, 1000);
 
   });
+
+  function updateAllIntervals(pid, data) {
+    var $proj = $('li.project[data-id='+pid+']');
+    if(typeof data.today != 'undefined') {
+      $proj.find('.time.today').data('value', data.today);
+    }
+    if(typeof data.todayFormatted != 'undefined') {
+      $proj.find('.time.today .value').text(data.todayFormatted);
+    }
+
+    if(typeof data.week != 'undefined') {
+      $proj.find('.time.week').data('value', data.week);
+    }
+    if(typeof data.weekFormatted != 'undefined') {
+      $proj.find('.time.week .value').text(data.weekFormatted);
+    }
+
+    if(typeof data.month != 'undefined') {
+      $proj.find('.time.month').data('value', data.month);
+    }
+    if(typeof data.monthFormatted != 'undefined') {
+      $proj.find('.time.month .value').text(data.monthFormatted);
+    }
+
+    if(typeof data.custom != 'undefined') {
+      $proj.find('.time.custom').data('value', data.custom);
+    }
+    if(typeof data.customFormatted != 'undefined') {
+      $proj.find('.time.custom .value').text(data.customFormatted);
+    }
+  }
 
   function initTimeProjectButtons() {
     $('.name .edit').click(function(){
@@ -663,7 +698,67 @@ $app = Yii::app();
       })
 
     });
-  }
+
+    $('.time .edit, .time .value').click(function(){
+      var $this = $(this),
+        $project = $this.parents('li'),
+        $parent = $this.parents('.time'),
+        $controls = $parent.find('.controls'),
+        $hours = $controls.find('.hours'),
+        $minutes = $controls.find('.minutes');
+      var seconds = parseInt($parent.data('value')),
+        hours = Math.floor(seconds/3600),
+        minutes = Math.floor((seconds%3600)/60);
+      if($project.data('status') == <?= TimeProject::STATUS_STARTED ?>) {
+        $project.find('.controls .stop').click();
+      }
+      $hours.val(hours);
+      $minutes.val(minutes);
+      $parent.find('.edit').hide();
+      $parent.find('.ok').show();
+      $this.hide();
+      $parent.find('.value').hide();
+      $controls.show();
+      $hours.focus();
+    });
+
+    $('.time .ok').click(function(){
+      var hours = $this.parents('.time').find('.controls .hours').val();
+      var minutes = $this.parents('.time').find('.controls .minutes').val();
+      var $proj = $this.parents('li.project');
+      var pid = $proj.data('id');
+      $.ajax({
+        url : '<?= $app->createUrl('timeTracker/updateToday') ?>',
+        data : {
+          id : pid,
+          hours : hours,
+          minutes : minutes,
+          from : $('#date_from').val(),
+          to : $('#date_to').val()
+        },
+        error : function(e) {
+        animatePopup(null, 'Не удалось получить данные с сервера', 'error');
+        console.dir(e);
+      },
+        success : function(res) {
+          var data = {};
+          try {
+            data = JSON.parse(res);
+            if(isAjaxGood(data)) {
+              updateAllIntervals(pid, data.data)
+            }
+            animateAjaxMessage(data);
+          } catch (exc) {
+            conole.dir(exc);
+            conole.dir(res);
+          }
+        }
+
+    })
+    });
+
+
+    }
 
   function createPopup(message, type) {
     if('undefined' == typeof type) {

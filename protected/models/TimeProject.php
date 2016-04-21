@@ -346,4 +346,12 @@ class TimeProject extends CActiveRecord
     return !isset($this->primaryKey);
   }
 
+  public function splitItemsByDays()
+  {
+    foreach($this->timeItems as $item) {
+      $item->splitByDays();
+    }
+    $this->timeItems = $this->getRelated('timeItems');
+  }
+
 }

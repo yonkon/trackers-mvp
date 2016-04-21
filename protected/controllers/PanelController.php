@@ -23,6 +23,9 @@ class PanelController extends Controller
         'params'=>array('status'=>TimeProject::STATUS_DELETED)
         )
     );
+    foreach($timeProjects as $tp) {
+      $tp->splitItemsByDays();
+    }
 //    $timeProjects = array();
     $timeTracker = $this->renderPartial('time_tracker', array('timeProjects' => $timeProjects), true);
 		$this->render('index', array(

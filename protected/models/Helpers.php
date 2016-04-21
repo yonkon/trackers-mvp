@@ -47,12 +47,14 @@ class Helpers
       return gmdate('s сек.', $time);
     }
     if($time<self::SECONDS_IN_DAY) {
-      return gmdate('H ч. i мин.', $time);
+      return gmdate('G ч. i мин.', $time);
     }
     if($time<self::SECONDS_IN_WEEK) {
-      return gmdate('d дн. H ч.', $time);
+      return gmdate('z дн. G ч.', $time);
     }
-    return gmdate('w нед. d дн. H ч.', $time);
+    return gmdate('z дн. G ч.', $time);
+//    return gmdate('W нед. w дн. H ч.', $time);
+//    return gmdate('W нед. d дн. H ч.', $time);
   }
 
 

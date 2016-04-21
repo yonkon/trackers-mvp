@@ -194,8 +194,7 @@ li.project .controls i, .name i {
   vertical-align: middle;
   line-height: 24px;
 }
-li.project .controls {
-  /*width: 2.5em;*/
+li.project > .controls {
   width: 35px;
 }
 
@@ -221,6 +220,7 @@ li.project .time {
   background: #C3D9FF;
   box-shadow: 0 0 0px 2px #c3d9ff;
   text-align: center;
+  /*position: relative;*/
 }
 
 #custom_date_value {
@@ -321,4 +321,32 @@ div#flash_popup.error {
 .submit-controls {
   font-size: 25px;
   letter-spacing: 5px;
+}
+
+.time span.value {
+  width: 90px;
+  display: inline-block;
+}
+
+.time .controls{
+  width: 90px;
+  float: left;
+  display: none;
+}
+
+.time .controls input {
+  width: 28px;
+  border: 0;
+  background: none;
+  display: inline-block;
+  text-align: center;
+  border-bottom: 1px dashed #F5F4FF;
+  box-sizing: border-box;
+  line-height: 100%;
+}
+
+.time .controls input+span{
+  display: inline-block;
+  width: 15px;
+  overflow: visible;
 }

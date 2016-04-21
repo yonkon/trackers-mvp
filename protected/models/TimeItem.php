@@ -215,4 +215,26 @@ class TimeItem extends CActiveRecord
     }
     $this->save();
   }
+
+  public function splitByDays()
+  {
+    $startMidnignt = Helpers::getMidnight($this->start_int);
+    $endMidnignt = Helpers::getMidnight($this->end_int);
+    if( $startMidnignt < $endMidnignt) {
+      $p2 = new TimeItem();
+      $p2->start = $this->start;
+      $p2->status = self::STATUS_STOPPED;
+      $p2->end = $startMidnignt + Helpers::SECONDS_IN_DAY - 1 ;
+      $p2->time_project_id = $this->time_project_id;
+      $p2->save();
+      $this->start = $p2->end_int+2;
+      if(Helpers::getMidnight($this->start_int) < $endMidnignt) {
+        return $this->splitByDays();
+      } else {
+        return $this->save();
+      }
+    }
+    return true;
+  }
+
 }
