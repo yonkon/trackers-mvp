@@ -28,11 +28,13 @@ class TimeProject extends CActiveRecord
   const STATUS_STOPPED = 0;
   const STATUS_STARTED = 1;
   const STATUS_DELETED = -1;
+  private $total;
   private $today;
   private $week;
   private $month;
   private $custom;
 
+  private $totalFormatted;
   private $todayFormatted;
   private $weekFormatted;
   private $monthFormatted;
@@ -102,7 +104,7 @@ class TimeProject extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-      'timeItems' => array(self::HAS_MANY, 'TimeItem', 'time_project_id')
+      'timeItems' => array(self::HAS_MANY, 'TimeItem', 'time_project_id', 'condition' => 'timeItems.status != '.TimeItem::STATUS_DISCARDED)
 		);
 	}
 
@@ -254,6 +256,14 @@ class TimeProject extends CActiveRecord
     return $this->custom;
   }
 
+  public function getTotal($refresh = true)
+  {
+    if($refresh || empty($this->month)) {
+      $this->processTimeIntervals();
+    }
+    return $this->total;
+  }
+
   public function stop($upd_time = null)
   {
     $this->setIsNewRecord(false);
@@ -292,6 +302,11 @@ class TimeProject extends CActiveRecord
   /**
    * @return string
    */
+  public function getTotalFormatted()
+  {
+    $this->totalFormatted = Helpers::formatTime($this->getTotal());
+    return $this->totalFormatted;
+  }
   public function getTodayFormatted()
   {
     $this->todayFormatted = Helpers::formatTime($this->getToday());
@@ -353,5 +368,16 @@ class TimeProject extends CActiveRecord
     }
     $this->timeItems = $this->getRelated('timeItems');
   }
+
+  /**
+   * @return TimeItem[]
+   */
+  public function getTimeItems2()
+  {
+    $allTimeItems = $this->getRelated('TimeItems');
+    return $this->timeItems;
+  }
+
+
 
 }

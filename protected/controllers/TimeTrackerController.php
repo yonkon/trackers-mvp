@@ -100,8 +100,45 @@ class TimeTrackerController extends Controller
     $minutes = intval($_REQUEST['minutes']);
     $from = intval($_REQUEST['from']);
     $to = intval($_REQUEST['to']);
+    /**
+     * @var TimeProject $proj
+     */
     $proj = TimeProject::model()->findByPk($pid);
+    $today = Helpers::getToday();
+    $tomorrow = Helpers::getTomorrow();
+    foreach($proj->timeItems as $item) {
+      if($item->start_int >= $today && $item->start_int < $tomorrow) {
+        $item->discard();
+      }
+    }
+    $ni = new TimeItem();
+    $ni->start = $today;
+    $ni->end = $today + $hours*Helpers::SECONDS_IN_HOUR + $minutes*Helpers::SECONDS_IN_MINUTE;
+    $ni->status = TimeItem::STATUS_STOPPED;
+    $ni->time_project_id = $proj->id;
+    if($ni->save()){
+      $proj->splitItemsByDays();
+      $time = $proj->processTimeIntervals($from, $to);
+      $this->jsonAsnwer(
+        array(
+          'id' => $proj->id,
+          'today' => $proj->getToday(),
+          'todayFormatted' => $proj->getTodayFormatted(),
+          'week' => $proj->getWeek(),
+          'weekFormatted' => $proj->getWeekFormatted(),
+          'month' => $proj->getMonth(),
+          'monthFormatted' => $proj->getMonthFormatted(),
+          'custom' => $proj->getCustom(),
+          'customFormatted' => $proj->getCustomFormatted(),
+          'total' => $proj->getTotal(),
+          'totalFormatted' => $proj->getTotalFormatted(),
+        )
+      );
 
+    } else {
+      $this->jsonAsnwer(null, self::STATUS_ERROR, CHtml::errorSummary($ni));
+    }
+    die();
   }
 
   public function actionStart(){

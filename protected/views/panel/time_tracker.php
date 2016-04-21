@@ -723,6 +723,7 @@ $app = Yii::app();
     });
 
     $('.time .ok').click(function(){
+      var $this = $(this);
       var hours = $this.parents('.time').find('.controls .hours').val();
       var minutes = $this.parents('.time').find('.controls .minutes').val();
       var $proj = $this.parents('li.project');
