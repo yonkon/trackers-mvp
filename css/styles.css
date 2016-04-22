@@ -223,11 +223,6 @@ li.project .time {
   /*position: relative;*/
 }
 
-#custom_date_value {
-  box-shadow: 0 0 0px 2px #c3d9ff;
-
-}
-
 .project-add {
   margin-left: 50px;
   margin-top: 8px;
@@ -274,6 +269,7 @@ li.project .time {
   width: 100%;
   /*display: block;*/
   background: #C3D9FF;
+  box-shadow: 0 0 0px 2px #c3d9ff;
 }
 
 .date-box {

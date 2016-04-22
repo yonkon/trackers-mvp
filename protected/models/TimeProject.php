@@ -49,6 +49,9 @@ class TimeProject extends CActiveRecord
 
   public static function getMaxPositionStatic($uid)
   {
+    /**
+     * @var $cmd CDbCommand
+     */
     $cmd = Yii::app()->db->createCommand('SELECT MAX(`position`) as `position` FROM ' . self::tableNameStatic() .
       ' WHERE `user_id` = ' . (int)$uid );
     $res = $cmd->queryScalar();
@@ -58,6 +61,9 @@ class TimeProject extends CActiveRecord
 
   public function getMaxPosition()
   {
+    /**
+     * @var $cmd CDbCommand
+     */
     $cmd = Yii::app()->db->createCommand('SELECT MAX(`position`) FROM ' . $this->tableName() .
       ' WHERE `user_id` = ' . $this->user_id);
     $res = $cmd->queryScalar();
@@ -176,7 +182,7 @@ class TimeProject extends CActiveRecord
     $tomorrow = Helpers::getTomorrow();
     $last_week = $tomorrow - Helpers::SECONDS_IN_WEEK;
     $last_month = $tomorrow - Helpers::SECONDS_IN_MONTH;
-    $total  = 0;
+    $this->total  = 0;
     $this->today = 0;
     $this->week = 0;
     $this->month = 0;
@@ -203,22 +209,22 @@ class TimeProject extends CActiveRecord
         ) {
           $this->custom += $seconds;
         }
+        $this->total += $seconds;
       }
-      $total += $seconds;
     }
     return array(
       'today' => $this->today,
       'week' => $this->week,
       'month' => $this->month,
       'custom' => $this->custom,
-      'total' => $total,
+      'total' => $this->total,
     );
   }
 
   /**
    * @return mixed
    */
-  public function getToday($refresh = true)
+  public function getToday($refresh = false)
   {
     if($refresh || empty($this->today)) {
       $this->processTimeIntervals();
@@ -229,7 +235,7 @@ class TimeProject extends CActiveRecord
   /**
    * @return mixed
    */
-  public function getWeek($refresh = true)
+  public function getWeek($refresh = false)
   {
     if($refresh || empty($this->week)) {
       $this->processTimeIntervals();
@@ -240,7 +246,7 @@ class TimeProject extends CActiveRecord
   /**
    * @return mixed
    */
-  public function getMonth($refresh = true)
+  public function getMonth($refresh = false)
   {
     if($refresh || empty($this->month)) {
       $this->processTimeIntervals();
@@ -302,29 +308,29 @@ class TimeProject extends CActiveRecord
   /**
    * @return string
    */
-  public function getTotalFormatted()
+  public function getTotalFormatted($refresh = true)
   {
-    $this->totalFormatted = Helpers::formatTime($this->getTotal());
+    $this->totalFormatted = Helpers::formatTime($this->getTotal($refresh));
     return $this->totalFormatted;
   }
-  public function getTodayFormatted()
+  public function getTodayFormatted($refresh = true)
   {
-    $this->todayFormatted = Helpers::formatTime($this->getToday());
+    $this->todayFormatted = Helpers::formatTime($this->getToday($refresh ));
     return $this->todayFormatted;
   }
-  public function getWeekFormatted()
+  public function getWeekFormatted($refresh = true)
   {
-    $this->weekFormatted = Helpers::formatTime($this->getWeek());
+    $this->weekFormatted = Helpers::formatTime($this->getWeek($refresh));
     return $this->weekFormatted;
   }
-  public function getMonthFormatted()
+  public function getMonthFormatted($refresh = true)
   {
-    $this->monthFormatted = Helpers::formatTime($this->getMonth());
+    $this->monthFormatted = Helpers::formatTime($this->getMonth($refresh));
     return $this->monthFormatted;
   }
-  public function getCustomFormatted()
+  public function getCustomFormatted($refresh = true)
   {
-    $this->customFormatted = Helpers::formatTime($this->getCustom());
+    $this->customFormatted = Helpers::formatTime($this->getCustom($refresh));
     return $this->customFormatted;
   }
 
@@ -366,15 +372,16 @@ class TimeProject extends CActiveRecord
     foreach($this->timeItems as $item) {
       $item->splitByDays();
     }
-    $this->timeItems = $this->getRelated('timeItems');
+    $this->timeItems = $this->getTimeItems();
   }
 
   /**
    * @return TimeItem[]
    */
-  public function getTimeItems2()
+  public function getTimeItems($refresh = true)
   {
-    $allTimeItems = $this->getRelated('TimeItems');
+    $allTimeItems = $this->getRelated('timeItems', $refresh);
+    $this->timeItems = $allTimeItems;
     return $this->timeItems;
   }
 

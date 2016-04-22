@@ -79,7 +79,8 @@ $app = Yii::app();
       <div class="time custom" data-value="<?= $project->custom ?>">
         <span class="value"><?= $project->customFormatted ?></span>&nbsp;
         <i class="edit glyphicon glyphicon-pencil"></i>
-      </div>
+        <i class="ok glyphicon glyphicon-ok" style="display: none"></i>
+        <div class="controls"><input class="hours" maxlength="4" value=""><span>ч.</span><input maxlength="2" class="minutes"><span>мин.</span></div>      </div>
     </li>
     <? endforeach; ?>
   </ol>
@@ -699,7 +700,7 @@ $app = Yii::app();
 
     });
 
-    $('.time .edit, .time .value').click(function(){
+    $('.time .edit, .time.today .value, .time.custom .value').click(function(){
       var $this = $(this),
         $project = $this.parents('li'),
         $parent = $this.parents('.time'),
@@ -716,7 +717,6 @@ $app = Yii::app();
       $minutes.val(minutes);
       $parent.find('.edit').hide();
       $parent.find('.ok').show();
-      $this.hide();
       $parent.find('.value').hide();
       $controls.show();
       $hours.focus();
@@ -727,7 +727,13 @@ $app = Yii::app();
       var hours = $this.parents('.time').find('.controls .hours').val();
       var minutes = $this.parents('.time').find('.controls .minutes').val();
       var $proj = $this.parents('li.project');
-      var pid = $proj.data('id');
+      var pid = $proj.data('id'),
+        $parent = $this.parents('.time'),
+        $controls = $parent.find('.controls');
+      $parent.find('.ok').hide();
+      $controls.hide();
+      $parent.find('.edit').show();
+      $parent.find('.value').show();
       $.ajax({
         url : '<?= $app->createUrl('timeTracker/updateToday') ?>',
         data : {
@@ -750,12 +756,41 @@ $app = Yii::app();
             }
             animateAjaxMessage(data);
           } catch (exc) {
-            conole.dir(exc);
-            conole.dir(res);
+            console.dir(exc);
+            console.dir(res);
           }
         }
 
     })
+    });
+
+    $('.time .controls input').keyup(function(e){
+      var keyCode = e.which;
+      var $parent = $(this).parents('.time');
+      if(keyCode == 13) { //ENTER
+        $parent.find('.ok').click();
+        return;
+      }
+      if(keyCode == 27) {
+        $parent.find('.controls').hide();
+        $parent.find('.ok').hide();
+        $parent.find('.edit').show();
+        $parent.find('.value').show();
+        return;
+      }
+    });
+
+    $(document).click(function(e){
+      var $openTimeControl = $('.time .controls:visible');
+      if($openTimeControl.length) {
+        var $parent = $openTimeControl.parents('.time');
+        if(!$parent.find(e.target).length) {
+          $openTimeControl.hide();
+          $parent.find('.ok').hide();
+          $parent.find('.edit').show();
+          $parent.find('.value').show();
+        }
+      }
     });
 
 
