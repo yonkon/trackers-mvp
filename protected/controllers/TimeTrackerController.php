@@ -98,8 +98,8 @@ class TimeTrackerController extends Controller
     $pid = intval($_REQUEST['id']);
     $hours = intval($_REQUEST['hours']);
     $minutes = intval($_REQUEST['minutes']);
-    $from = intval($_REQUEST['from']);
-    $to = intval($_REQUEST['to']);
+    $from = intval(strtotime($_REQUEST['from']));
+    $to = empty($_REQUEST['to']) ? Helpers::getTomorrow() : strtotime($_REQUEST['to'])+Helpers::SECONDS_IN_DAY;
     /**
      * @var TimeProject $proj
      */
@@ -138,6 +138,66 @@ class TimeTrackerController extends Controller
     } else {
       $this->jsonAsnwer(null, self::STATUS_ERROR, CHtml::errorSummary($ni));
     }
+    die();
+  }
+
+  public function actionUpdateCustom() {
+    $pid = intval($_REQUEST['id']);
+    $hours = intval($_REQUEST['hours']);
+    $minutes = intval($_REQUEST['minutes']);
+    $from = intval(strtotime($_REQUEST['from']));
+    $to = empty($_REQUEST['to']) ? Helpers::getTomorrow() : strtotime($_REQUEST['to'])+Helpers::SECONDS_IN_DAY;
+    /**
+     * @var TimeProject $proj
+     */
+    $proj = TimeProject::model()->findByPk($pid);
+    $today = Helpers::getToday();
+    $tomorrow = Helpers::getTomorrow();
+    $minimal_start = empty($from) ? Helpers::getToday() : $from;
+    foreach($proj->getTimeItems() as $item) {
+      if(empty($from) && $minimal_start > $item->start_int) {
+        $minimal_start = $item->start_int;
+      }
+    }
+    foreach($proj->getTimeItems() as $item) {
+      if($item->start_int >= $minimal_start && $item->start_int < $to) {
+        $item->discard();
+      }
+    }
+    $minimal_start = Helpers::getMidnight($minimal_start);
+    $nDays = Helpers::dayDifference($minimal_start, $to);
+    $secondsTotal = $hours*Helpers::SECONDS_IN_HOUR + $minutes*Helpers::SECONDS_IN_MINUTE;
+    $secondsPerDay = min(Helpers::SECONDS_IN_DAY-1, ceil($secondsTotal / $nDays));
+    $start = $minimal_start;
+    for($i = 0; $i < $nDays; $i++) {
+      $ni = new TimeItem();
+      $ni->start = $start;
+      $ni->end = $start + $secondsPerDay;
+      $ni->status = TimeItem::STATUS_STOPPED;
+      $ni->time_project_id = $proj->id;
+      if(!$ni->save()) {
+        $this->jsonAsnwer(null, self::STATUS_ERROR, CHtml::errorSummary($ni));
+        break;
+      }
+      $start += Helpers::SECONDS_IN_DAY;
+      }
+      $proj->splitItemsByDays();
+      $time = $proj->processTimeIntervals($from, $to);
+      $this->jsonAsnwer(
+        array(
+          'id' => $proj->id,
+          'today' => $proj->getToday(false),
+          'todayFormatted' => $proj->getTodayFormatted(false),
+          'week' => $proj->getWeek(false),
+          'weekFormatted' => $proj->getWeekFormatted(false),
+          'month' => $proj->getMonth(false),
+          'monthFormatted' => $proj->getMonthFormatted(false),
+          'custom' => $proj->getCustom(false),
+          'customFormatted' => $proj->getCustomFormatted(false),
+          'total' => $proj->getTotal(false),
+          'totalFormatted' => $proj->getTotalFormatted(false),
+        )
+      );
     die();
   }
 

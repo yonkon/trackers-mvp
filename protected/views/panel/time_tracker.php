@@ -18,9 +18,9 @@ $app = Yii::app();
 <div class="projects">
   <ol class="pr-list">
     <li class="project header">
-      <div class="time">Today</div>
-      <div class="time">Week</div>
-      <div class="time">Month</div>
+      <div class="time">Сегодня</div>
+      <div class="time">За неделю</div>
+      <div class="time">За месяц</div>
       <div class="time calendar">
         <i class="glyphicon glyphicon-calendar"></i><span class="tip">
           За всё время
@@ -183,7 +183,7 @@ $app = Yii::app();
       }).datepicker('show');
     }
 
-    $('.time.calendar>i').click(function(){
+    $('.time.calendar>i, .time.calendar .tip').click(function(){
       var $this = $(this).parent();
       $this.find('#custom_date_value').slideToggle('fast');
     });
@@ -306,7 +306,9 @@ $app = Yii::app();
       $('li.project').each(function(i, el){
         var $proj = $(this),
           pid = $proj.data('id'),
-          pkey = 'timeProject['+pid+']';
+          pkey = 'timeProject['+pid+']',
+          d = new Date();
+        today = d.toLocaleDateString();
         if($proj.data('status') == <?= TimeProject::STATUS_STARTED?>) {
           var pSeconds = parseInt($proj.data('seconds')) + 1;
           if ($.isNumeric(pSeconds)) {
@@ -327,7 +329,7 @@ $app = Yii::app();
           $proj.find('.time').each(function (i2, el2) {
             var $this = $(this);
             seconds = parseInt($this.data('value')) + 1;
-            if ($.isNumeric(seconds)) {
+            if ($.isNumeric(seconds) && (!$this.hasClass('custom') || today == $('#date_to').val() || !$('#date_to').val() ) ) {
               $this.data('value', seconds);
               $this.find('.value').text(seconds2Time(seconds));
             }
@@ -469,6 +471,7 @@ $app = Yii::app();
       var $parent = $controls.parent();
       $controls.hide();
       $parent.find('.edit').show();
+      $parent.find('.delete').show();
     });
 
 
@@ -729,13 +732,15 @@ $app = Yii::app();
       var $proj = $this.parents('li.project');
       var pid = $proj.data('id'),
         $parent = $this.parents('.time'),
-        $controls = $parent.find('.controls');
+        $controls = $parent.find('.controls'),
+        url = $parent.hasClass('today') ? '<?= $app->createUrl('timeTracker/updateToday') ?>' : '<?= $app->createUrl('timeTracker/updateCustom') ?>';
       $parent.find('.ok').hide();
       $controls.hide();
       $parent.find('.edit').show();
       $parent.find('.value').show();
+
       $.ajax({
-        url : '<?= $app->createUrl('timeTracker/updateToday') ?>',
+        url : url,
         data : {
           id : pid,
           hours : hours,

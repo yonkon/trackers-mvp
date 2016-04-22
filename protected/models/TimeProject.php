@@ -110,7 +110,7 @@ class TimeProject extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-      'timeItems' => array(self::HAS_MANY, 'TimeItem', 'time_project_id', 'condition' => 'timeItems.status != '.TimeItem::STATUS_DISCARDED)
+      'timeItems' => array(self::HAS_MANY, 'TimeItem', 'time_project_id', 'on' => 'timeItems.status != '.TimeItem::STATUS_DISCARDED)
 		);
 	}
 
@@ -187,6 +187,9 @@ class TimeProject extends CActiveRecord
     $this->week = 0;
     $this->month = 0;
     $this->custom = 0;
+    if(isset($custom_to)) {
+      $custom_to += Helpers::SECONDS_IN_DAY;
+    }
 
     foreach($this->timeItems as $item) {
       if($item->start_int < $tomorrow) {
@@ -254,7 +257,7 @@ class TimeProject extends CActiveRecord
     return $this->month;
   }
 
-  public function getCustom($from = null, $to = null, $refresh = false)
+  public function getCustom($refresh = false, $from = null, $to = null )
   {
     if($refresh || !isset($this->custom) || !empty($from) || !empty($to)) {
       $this->processTimeIntervals($from, $to);
@@ -262,7 +265,7 @@ class TimeProject extends CActiveRecord
     return $this->custom;
   }
 
-  public function getTotal($refresh = true)
+  public function getTotal($refresh = false)
   {
     if($refresh || empty($this->month)) {
       $this->processTimeIntervals();
@@ -308,27 +311,27 @@ class TimeProject extends CActiveRecord
   /**
    * @return string
    */
-  public function getTotalFormatted($refresh = true)
+  public function getTotalFormatted($refresh = false)
   {
     $this->totalFormatted = Helpers::formatTime($this->getTotal($refresh));
     return $this->totalFormatted;
   }
-  public function getTodayFormatted($refresh = true)
+  public function getTodayFormatted($refresh = false)
   {
     $this->todayFormatted = Helpers::formatTime($this->getToday($refresh ));
     return $this->todayFormatted;
   }
-  public function getWeekFormatted($refresh = true)
+  public function getWeekFormatted($refresh = false)
   {
     $this->weekFormatted = Helpers::formatTime($this->getWeek($refresh));
     return $this->weekFormatted;
   }
-  public function getMonthFormatted($refresh = true)
+  public function getMonthFormatted($refresh = false)
   {
     $this->monthFormatted = Helpers::formatTime($this->getMonth($refresh));
     return $this->monthFormatted;
   }
-  public function getCustomFormatted($refresh = true)
+  public function getCustomFormatted($refresh = false)
   {
     $this->customFormatted = Helpers::formatTime($this->getCustom($refresh));
     return $this->customFormatted;

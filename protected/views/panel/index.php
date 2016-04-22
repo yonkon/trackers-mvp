@@ -1,6 +1,9 @@
 <?php
-/* @var $this PanelController */
-
+/**
+ * @var $this PanelController
+ * @var $app CWebApplication
+ **/
+$app = Yii::app();
 $this->breadcrumbs=array(
 	'Panel',
 );
@@ -9,7 +12,7 @@ $this->breadcrumbs=array(
 
 <div class="panel">
   <div class="p-heading">
-    wrlcome user / info /
+    <span class="welcome">Добро пожаловать, <?= $app->user->name ?></span> <span class="p-info">Здесь будет информация с виджетов</span>
   </div>
   <div class="p-body">
     <div class="p-tabs">

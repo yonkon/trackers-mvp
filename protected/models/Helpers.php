@@ -57,5 +57,10 @@ class Helpers
 //    return gmdate('W нед. d дн. H ч.', $time);
   }
 
+  public static function dayDifference($before, $after, $getPositiveValue = true) {
+    $delta = $getPositiveValue ? abs($after - $before) : ($after - $before);
+    $delta = ceil($delta/self::SECONDS_IN_DAY);
+    return $delta;
+  }
 
 }
