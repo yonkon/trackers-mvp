@@ -1,0 +1,22 @@
+#new_task {
+  margin: 16px 0;
+  padding-left: 90px;
+}
+
+#task_form > .w50 {
+  vertical-align: top;
+  padding: 0 90px;
+}
+
+#task_form input,
+#task_description {
+   width:100%;
+  max-width: 100%;
+}
+
+#task_form input[type=checkbox] {
+  width: auto;
+  display: inline-block;
+  vertical-align: text-bottom;
+  margin-left: 12px;
+}

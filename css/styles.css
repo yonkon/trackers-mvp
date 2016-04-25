@@ -357,3 +357,13 @@ div#flash_popup.error {
   overflow: visible;
 }
 
+.w50 {
+  width: 49.5%;
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 0;
+}
+
+.wauto {
+  width: auto !important;
+}

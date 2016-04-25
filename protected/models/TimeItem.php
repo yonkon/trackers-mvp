@@ -21,7 +21,7 @@ class TimeItem extends CActiveRecord
   const STATUS_STOPPED = 0;
   const STATUS_DISCARDED = -1;
 
-  /**
+	/**
 	 * @return string the associated database table name
 	 */
 	public function tableName()

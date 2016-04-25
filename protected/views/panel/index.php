@@ -17,7 +17,7 @@ $this->breadcrumbs=array(
   <div class="p-body">
     <div class="p-tabs">
       <div class="p-tab active" id="time_tab">Time tracker  </div>
-      <div class="p-tab" id="task_tab">       Task tracker  </div>
+      <div class="p-tab" id="task_tab" onclick="loadTasks()">       Task tracker  </div>
       <div class="p-tab" id="rss_tab">        Rss reader    </div>
       <div class="p-tab" id="notes_tab">      Notes         </div>
       <div class="p-tab" id="fav_tab">        Favourites    </div>
@@ -65,4 +65,26 @@ $this->breadcrumbs=array(
         $('#'+cid).addClass('active');
       });
   });
+
+  function loadTasks() {
+    $.ajax({
+      url : '<?= $app->createUrl('taskTracker/ajax') ?>',
+      success : function(res) {
+        var data = {};
+        try  {
+          data = JSON.parse(res);
+          if(isAjaxGood(data)) {
+            $('#task_content').html(data.data.html);
+          }
+          animateAjaxMessage(data);
+        } catch (exc) {
+          console.dir(exc);
+          console.dir(res);
+        }
+      },
+      error : function(e) {
+        animatePopup(null, 'Невозможно получить данные с сервера', 'error');
+      }
+    });
+  }
 </script>
