@@ -13,7 +13,11 @@
  */
 class TaskMonthSchedule extends CActiveRecord
 {
-	/**
+  const STATUS_ACTIVE = 1;
+  const STATUS_DISABLED = 0;
+
+
+  /**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
@@ -45,6 +49,7 @@ class TaskMonthSchedule extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+      'taskItem' => array(self::BELONGS_TO, 'TaskItem', 'task_item_id')
 		);
 	}
 

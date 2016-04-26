@@ -801,7 +801,7 @@ $app = Yii::app();
 
     }
 
-  function createPopup(message, type) {
+  /*function createPopup(message, type) {
     if('undefined' == typeof type) {
       type = 'info';
     }
@@ -840,6 +840,6 @@ $app = Yii::app();
 
   function hasAjaxMessage(parsed) {
     return (parsed && typeof (parsed.message) != 'undefined' && parsed.message.length);
-  }
+  }*/
 
 </script>

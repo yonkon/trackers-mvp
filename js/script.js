@@ -57,3 +57,44 @@ seconds2Time.day = 86400;
 seconds2Time.week = 604800;
 seconds2Time.month = 2592000;
 seconds2Time.year = 31557600;
+
+function createPopup(message, type) {
+    if('undefined' == typeof type) {
+        type = 'info';
+    }
+    var $flashpopup = $('#flash_popup');
+    if($flashpopup.length) {
+        $flashpopup.removeClass();
+        $flashpopup.addClass(type);
+        $flashpopup.html(message);
+    } else {
+        $flashpopup = $('<div id="flash_popup" class="' + type + '">'+message+"</div>");
+        $flashpopup.appendTo(document.body);
+    }
+    return $flashpopup;
+}
+
+function animatePopup($element, message, type) {
+    if(!$element || typeof($element) == 'undefined' || !$element.length) {
+        $element = createPopup(message, type);
+    }
+    $element.fadeIn().animate({opacity: 1.0}, 3000).fadeOut("slow");
+}
+
+function animateAjaxMessage(data) {
+    if(hasAjaxMessage(data)) {
+        var type = 'error';
+        if(typeof data.status != 'undefined') {
+            type = data.status;
+        }
+        animatePopup(null, data.message, type);
+    }
+}
+
+function isAjaxGood(parsed) {
+    return (parsed && typeof (parsed.status) != 'undefined' && parsed.status == "OK");
+}
+
+function hasAjaxMessage(parsed) {
+    return (parsed && typeof (parsed.message) != 'undefined' && parsed.message.length);
+}

@@ -63,4 +63,52 @@ class Helpers
     return $delta;
   }
 
+  public static function getTimestamp($date) {
+    if(empty($date)) {
+      return time();
+    }
+    if(is_numeric($date)) {
+      return $date;
+    }
+    return strtotime($date);
+  }
+
+  public static function getLocaleDate($date = null, $lang = 'ru') {
+    //$format = 'd n';
+    $ts = self::getTimestamp($date);
+    $day = date('d', $ts);
+    $month = intval(date('n', $ts));
+    $monthTr = self::getMonthName($month-1, $lang);
+    if(empty($monthTr)) {
+      $monthTr = $month;
+    }
+    $res = "{$day} {$monthTr}";
+    return $res;
+  }
+
+  public static function getMonthName($monthNum, $lang = 'ru') {
+    $monthNames = array(
+      'ru' => array(
+        'Января',
+        'Февраля',
+        'Марта',
+        'Апреля',
+        'Мая',
+        'Июня',
+        'Июля',
+        'Авгуса',
+        'Сентября',
+        'Октября',
+        'Ноября',
+        'Декабря'
+      )
+    );
+    if(empty($lang)) {
+      return $monthNames;
+    }
+    if(!is_numeric($monthNum)) {
+      return $monthNames[$lang];
+    }
+    return $monthNames[$lang][$monthNum];
+  }
 }

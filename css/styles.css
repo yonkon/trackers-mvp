@@ -191,7 +191,7 @@ li.project>div {
 }
 
 .green-text {
-  color: green;
+  color: #2b801f;
 }
 
 .red-text {
@@ -366,4 +366,14 @@ div#flash_popup.error {
 
 .wauto {
   width: auto !important;
+}
+
+.centered {
+  display: block;
+  margin: 0 auto;
+}
+.centered-content {
+  display: block;
+  margin: 0 auto;
+  text-align: center;
 }

@@ -14,10 +14,17 @@
  * @property string $close_date
  * @property integer $repeat_every
  * @property integer $week_schedule
+ * @property string $status_text
+ * @property TaskProject taskProject
+ * @property integer close_date_int
  */
 class TaskItem extends CActiveRecord
 {
-	/**
+  const STATUS_NEW = 1;
+  const STATUS_TEXT_NEW = 'Новый';
+
+
+  /**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
@@ -35,10 +42,10 @@ class TaskItem extends CActiveRecord
 		return array(
 			array('task_project_id, name, user_id', 'required'),
 			array('task_project_id, status, user_id, repeat_every, week_schedule', 'numerical', 'integerOnly'=>true),
-			array('close_date', 'safe'),
+			array('close_date, description, status_text', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, task_project_id, name, description, status, created, user_id, close_date, repeat_every, week_schedule', 'safe', 'on'=>'search'),
+			array('id, task_project_id, name, description, status, created, user_id, close_date, repeat_every, week_schedule, status_text', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -50,6 +57,7 @@ class TaskItem extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
+      'taskProject' => array( self::BELONGS_TO,'TaskProject', 'task_project_id')
 		);
 	}
 
@@ -69,6 +77,7 @@ class TaskItem extends CActiveRecord
 			'close_date' => 'Close Date',
 			'repeat_every' => 'Repeat Every',
 			'week_schedule' => 'Week Schedule',
+      'status_text' => 'Status',
 		);
 	}
 
@@ -100,6 +109,7 @@ class TaskItem extends CActiveRecord
 		$criteria->compare('close_date',$this->close_date,true);
 		$criteria->compare('repeat_every',$this->repeat_every);
 		$criteria->compare('week_schedule',$this->week_schedule);
+    $criteria->compare('status_text',$this->status_text,true);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,
@@ -116,4 +126,18 @@ class TaskItem extends CActiveRecord
 	{
 		return parent::model($className);
 	}
+
+  /**
+   * @return int
+   */
+  public function getClose_date_int()
+  {
+    $res = is_numeric($this->close_date)? intval($this->close_date) : strtotime($this->close_date);
+    return  $res;
+  }
+
+  public function save($runValidation=true,$attributes=null) {
+    $this->close_date = Helpers::time2mysql_ts($this->close_date_int);
+    return parent::save($runValidation,$attributes);
+  }
 }

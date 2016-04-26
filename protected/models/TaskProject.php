@@ -9,10 +9,13 @@
  * @property integer $status
  * @property string $created
  * @property string $updated
+ * @property integer $user_id
  */
 class TaskProject extends CActiveRecord
 {
-	/**
+  const STATUS_ACTIVE = 1;
+
+  /**
 	 * @return string the associated database table name
 	 */
 	public function tableName()
@@ -28,12 +31,12 @@ class TaskProject extends CActiveRecord
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
 		return array(
-			array('name', 'required'),
-			array('status', 'numerical', 'integerOnly'=>true),
+			array('name, user_id', 'required'),
+			array('status, user_id', 'numerical', 'integerOnly'=>true),
 			array('updated', 'safe'),
 			// The following rule is used by search().
 			// @todo Please remove those attributes that should not be searched.
-			array('id, name, status, created, updated', 'safe', 'on'=>'search'),
+			array('id, name, status, created, updated, user_id', 'safe', 'on'=>'search'),
 		);
 	}
 
@@ -45,7 +48,8 @@ class TaskProject extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-		);
+      'taskItems' => array(self::HAS_MANY, 'TaskItem', 'task_project_id')
+    );
 	}
 
 	/**
@@ -59,6 +63,7 @@ class TaskProject extends CActiveRecord
 			'status' => 'Status',
 			'created' => 'Created',
 			'updated' => 'Updated',
+			'user_id' => 'User',
 		);
 	}
 
@@ -85,6 +90,7 @@ class TaskProject extends CActiveRecord
 		$criteria->compare('status',$this->status);
 		$criteria->compare('created',$this->created,true);
 		$criteria->compare('updated',$this->updated,true);
+    $criteria->compare('user_id',$this->user_id);
 
 		return new CActiveDataProvider($this, array(
 			'criteria'=>$criteria,

@@ -3,6 +3,9 @@
   padding-left: 90px;
 }
 
+#task_form > .w50 > div {
+  clear: both;
+}
 #task_form > .w50 {
   vertical-align: top;
   padding: 0 90px;
@@ -19,4 +22,41 @@
   display: inline-block;
   vertical-align: text-bottom;
   margin-left: 12px;
+}
+
+.tasks {
+  margin-left: 90px;
+}
+
+#task_form {
+  display: none;
+}
+
+#task_week_schedule_values b.selected {
+  color: #2b801f;
+}
+
+#task_week_schedule_values b {
+  cursor: pointer;
+}
+
+#tasks .task>div {
+  display: inline-block;
+}
+
+#tasks {
+  margin-left: 90px;
+}
+
+#tasks.table .today,
+#tasks.table .soon
+{
+  display: table;
+}
+
+#tasks.table .task {
+  display: table-row;
+}
+#tasks.table .task>div {
+  display: table-cell;
 }

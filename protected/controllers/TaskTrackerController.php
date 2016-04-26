@@ -6,7 +6,7 @@ class TaskTrackerController extends Controller
 	{
     $app = Yii::app();
     $uid = $app->user->id;
-    $tasks = TaskItem::model()->find("user_id = {$uid}");
+    $tasks = TaskItem::model()->findAll("user_id = {$uid}");
 		$html = $this->renderPartial('ajax', array('tasks' => $tasks), true);
     $this->jsonAsnwer(array('html' => $html));
     die();
@@ -14,7 +14,78 @@ class TaskTrackerController extends Controller
 
 	public function actionIndex()
 	{
-		$this->render('index');
+    /**
+     * @var $app CWebApplication
+     */
+    $app = Yii::app();
+    if($app->user->isGuest) {
+      $this->redirect($app->createUrl('login'));
+    }
+    $uid = $app->user->id;
+    $tasks = TaskItem::model()->findAll("user_id = {$uid}");
+    $this->render('ajax', array('tasks' => $tasks));
+	}
+
+  public function actionCreate()
+	{/**
+   * @var $app CWebApplication
+   */
+    $app = Yii::app();
+    if($app->user->isGuest) {
+      $this->redirect($app->createUrl('login'));
+    }
+    $tpid = intval($_REQUEST['task_project_id']);
+    $tpname = empty($_REQUEST['task_project_name']) ? $_REQUEST['name'] : $_REQUEST['task_project_name'];
+    $uid = $app->user->id;
+    $proj = null;
+    $errors = array();
+    $monthSc = $_REQUEST['month_schedule'];
+    if (!empty($tpid)) {
+      $proj = TaskProject::model()->findByPk($tpid);
+    }
+    if (!empty($tpname)) {
+      if (empty($proj)) {
+        $proj = TaskProject::model()->findByAttributes(array('name' => $tpname, 'user_id' => $uid));
+      }
+      if (empty($proj)) {
+        $proj = new TaskProject();
+        $proj->user_id = $uid;
+        $proj->name = $tpname;
+        $proj->status = TaskProject::STATUS_ACTIVE;
+        if (!$proj->save()) {
+          $this->jsonAsnwer(array('project' => $proj), self::STATUS_ERROR, CHtml::errorSummary($proj));
+          die();
+        }
+      }
+    }
+    $task = new TaskItem();
+    $task->user_id = $uid;
+    $task->status = TaskItem::STATUS_NEW;
+    $task->status_text = TaskItem::STATUS_TEXT_NEW;
+    $task->setAttributes($_REQUEST);
+    $task->task_project_id = $proj->id;
+    if(!$task->validate() || !$task->save()) {
+      $this->jsonAsnwer(array('project' => $proj, 'task' => $task), self::STATUS_ERROR, CHtml::errorSummary($task) );
+      die();
+    }
+    if(!empty($monthSc)) {
+      foreach($monthSc as $day) {
+        $mc = new TaskMonthSchedule();
+        $mc->task_item_id = $task->id;
+        $mc->day = intval($day);
+        $mc->status = TaskMonthSchedule::STATUS_ACTIVE;
+        if(!$mc->validate() || !$mc->save()) {
+          $errors[0] = 'Не удалось сохранить некоторые дни повторения для таска';
+          $errors[] = CHtml::errorSummary($mc);
+        }
+      }
+    }
+    if(empty($errors)) {
+      $this->jsonAsnwer(array('task'=>$task, 'project' => $proj), self::STATUS_OK, 'Таск успешно открыт');
+    } else {
+      $this->jsonAsnwer(array('task'=>$task, 'project' => $proj, 'errors'=>$errors), self::STATUS_ERROR, join('<br>', $errors));
+    }
+    die();
 	}
 
 	// Uncomment the following methods and override them if needed
