@@ -57,7 +57,8 @@ class TaskItem extends CActiveRecord
 		// NOTE: you may need to adjust the relation name and the related
 		// class name for the relations automatically generated below.
 		return array(
-      'taskProject' => array( self::BELONGS_TO,'TaskProject', 'task_project_id')
+      'taskProject' => array( self::BELONGS_TO,'TaskProject', 'task_project_id'),
+      'monthSchedule' => array( self::HAS_MANY,'TaskMonthSchedule', 'task_item_id')
 		);
 	}
 
@@ -139,5 +140,18 @@ class TaskItem extends CActiveRecord
   public function save($runValidation=true,$attributes=null) {
     $this->close_date = Helpers::time2mysql_ts($this->close_date_int);
     return parent::save($runValidation,$attributes);
+  }
+
+  public function getMonthScheduleDays() {
+    $days = array();
+    foreach ($this->monthSchedule as $record) {
+      $days[] = $record->day;
+    }
+    return $days;
+  }
+  public function getMonthScheduleDaysString()
+  {
+    $days = $this->getMonthScheduleDays();
+    return join(', ', $days);
   }
 }

@@ -42,10 +42,11 @@
 
 #tasks .task>div {
   display: inline-block;
+  vertical-align: middle;
 }
 
 #tasks {
-  margin-left: 90px;
+  margin: 0 30px;
 }
 
 #tasks.table .today,
@@ -59,4 +60,70 @@
 }
 #tasks.table .task>div {
   display: table-cell;
+}
+
+.task .tname {
+  width: 180px;
+}
+
+.task.theader .tdate,
+.task.theader .tstatus,
+.task.theader .tproject
+{
+  cursor: pointer;
+}
+
+.task .tdate {
+  width: 160px;
+}
+.task .tstatus {
+  width: 110px;
+}
+.task .tproject {
+  width: 140px;
+}
+.task .tdescription {
+  width: 170px;
+}
+.task .texecute {
+  width: 90px;
+}
+
+.task.theader {
+  font-size: 17px;
+  font-weight: bold;
+}
+
+.task > div:not(:first-of-type) {
+  text-align: center;
+  margin-left: 10px;
+}
+
+.task:nth-child(1) {
+  background: rgba(201, 224, 237, 0.7);
+}
+.task:nth-child(2n+3) {
+  background: rgba(212, 234, 247, 0.7);
+}
+.task:nth-child(2n+2) {
+  background: rgba(245, 244, 255, 0.7);
+}
+
+#tasks .task:hover>div.tedit {
+  display: inline-block;
+}
+#tasks .task>div.tedit {
+  display: none;
+  margin-right: -20px;
+  margin-left: 0;
+  width: 16px;
+  cursor: pointer;
+}
+
+#task_month_schedule_add {
+  cursor: pointer;
+}
+
+#task_month_schedule_input {
+  display: none;
 }
