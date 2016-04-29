@@ -41,7 +41,7 @@ class Helpers
   public static function formatTime($time, $format = null) {
 
     if(!empty($format)) {
-      return gmdate($format, $time);
+      return date($format, $time);
     }
     if($time<self::SECONDS_IN_MINUTE) {
       return gmdate('s сек.', $time);

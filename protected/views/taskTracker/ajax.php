@@ -123,6 +123,8 @@ $this->breadcrumbs=array(
 <script type="text/javascript">
   $(function() {
     $.datepicker.setDefaults($.datepicker.regional['ru']);
+    $('#task_choose').autocomplete({source :'<?= $app->createUrl('taskTracker/getTaskProjectsArray')?>'});
+
     $('#task_form').find('.submit').click(function () {
       var $this = $(this),
         $form = $this.parents('#task_form'),
@@ -185,7 +187,7 @@ $this->breadcrumbs=array(
       $('#task_form').show();
       $('#tasks').hide();
     });
-    $('.task .tedit').click(function(){
+    var initEdit = function(){
       var $parent =  $(this).parent(),
         tid = $parent.data('id'),
         tname = $parent.find('.tname').text(),
@@ -193,6 +195,8 @@ $this->breadcrumbs=array(
         tdate = $parent.find('.tdate').data('value'),
         tstatus = $parent.find('.tstatus').text(),
         tproject = $parent.find('.tproject').text(),
+        trepeated = $parent.data('repeated'),
+        tevery = $parent.data('every'),
         tweek = $parent.data('week'),
         tmonth = $parent.data('month');
       updateWeekSchedule(tweek);
@@ -203,9 +207,16 @@ $this->breadcrumbs=array(
       $('#task_status').val(tstatus);
       $('#task_choose').val(tproject);
       $('#task_close_date').val(tdate);
+      if(trepeated) {
+        $('#task_repeated').attr('checked','checked');
+      } else {
+        $('#task_repeated').removeAttr('checked');
+      }
+      $('#task_repeat_every').val(tevery);
       $('#task_form').show();
       $('#tasks').hide();
-    });
+    };
+    $('.task .tedit').click(initEdit);
 
     $('#task_close_date').datepicker({
       changeMonth: true,
@@ -244,9 +255,6 @@ $this->breadcrumbs=array(
       $rows.each(function(i, el) {
           values.push({k: i, v:$(el).text()});
         });
-//        values.sort(function(a, b) {
-//          return a.v.localeCompare(b.v);
-//        });
       if(!sorting || sorting == 'desc') {
         sorting = 'asc';
         values.sort(function(a, b) {
@@ -270,6 +278,7 @@ $this->breadcrumbs=array(
       for(var i = 0; i<values.length; i++) {
         $this.parent().parent().append(rows[i]);
       }
+      $('.task .tedit').click(initEdit);
     });
 
     $('#task_week_schedule_values b').click(function(){
@@ -305,13 +314,13 @@ $this->breadcrumbs=array(
   };
 
   var updateMonthSchedule = function(days){
-    var daysStr = days.jion(' ');
+    var daysStr = Array.isArray(days) ? days.join(' ') : days;
     var $month_vals = $('#task_month_schedule_input');
     $month_vals.val(daysStr);
   };
 
   var updateMonthSchedule2 = function(days){
-    days = days.split(',');
+    days = days.split(' ');
     var $month_vals = $('#task_month_schedule_values');
     $month_vals.html('');
     for(var i = 0; i<days.length; i++) {

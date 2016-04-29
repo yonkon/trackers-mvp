@@ -40,6 +40,10 @@
   cursor: pointer;
 }
 
+#tasks .task {
+padding-left: 15px;
+}
+
 #tasks .task>div {
   display: inline-block;
   vertical-align: middle;
