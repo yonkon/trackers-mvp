@@ -48,10 +48,21 @@ class TaskTrackerController extends Controller
       $this->jsonAsnwer(null, self::STATUS_ERROR, 'Не найден таск');
       die();
     }
-    if($task->execute()) {
-      $this->jsonAsnwer(array('task' => $task), self::STATUS_OK, 'Проект успешно выполнен');
+    if(empty($_REQUEST['execute'])) {
+      if($task->unexecute()) {
+        $this->jsonAsnwer(array(
+          'task' => $task,
+          'html' => $this->renderPartial('taskItem', array('task' => $task), true))
+          , self::STATUS_OK, 'Проект успешно выполнен');
+      } else {
+        $this->jsonAsnwer(array('task' => $task->getAttributes()), self::STATUS_ERROR, CHtml::errorSummary($task));
+      }
     } else {
-      $this->jsonAsnwer(array('task' => $task), self::STATUS_ERROR, CHtml::errorSummary($task));
+      if($task->execute()) {
+        $this->jsonAsnwer(array('task' => $task->getAttributes(),'html' => $this->renderPartial('taskItem', array('task' => $task), true)), self::STATUS_OK, 'Проект успешно выполнен');
+      } else {
+        $this->jsonAsnwer(array('task' => $task->getAttributes()), self::STATUS_ERROR, CHtml::errorSummary($task));
+      }
     }
     die();
   }
@@ -83,7 +94,7 @@ class TaskTrackerController extends Controller
         $proj->name = $tpname;
         $proj->status = TaskProject::STATUS_ACTIVE;
         if (!$proj->save()) {
-          $this->jsonAsnwer(array('project' => $proj), self::STATUS_ERROR, CHtml::errorSummary($proj));
+          $this->jsonAsnwer(array('project' => $proj->getAttributes()), self::STATUS_ERROR, CHtml::errorSummary($proj));
           die();
         }
       }
@@ -95,7 +106,7 @@ class TaskTrackerController extends Controller
     $task->setAttributes($_REQUEST);
     $task->task_project_id = $proj->id;
     if(!$task->validate() || !$task->save()) {
-      $this->jsonAsnwer(array('project' => $proj, 'task' => $task), self::STATUS_ERROR, CHtml::errorSummary($task) );
+      $this->jsonAsnwer(array('project' => $proj->getAttributes(), 'task' => $task->getAttributes()), self::STATUS_ERROR, CHtml::errorSummary($task) );
       die();
     }
     if(!empty($monthSc)) {
@@ -111,13 +122,13 @@ class TaskTrackerController extends Controller
       }
     }
     if(empty($errors)) {
-      $this->jsonAsnwer(array('task'=>$task,
-        'project' => $proj,
+      $this->jsonAsnwer(array('task'=>$task->getAttributes(),
+        'project' => $proj->getAttributes(),
         'html' => $this->renderPartial('taskItem', array('task' => $task), true)),
         self::STATUS_OK, 'Таск успешно открыт');
     } else {
-      $this->jsonAsnwer(array('task'=>$task,
-        'project' => $proj,
+      $this->jsonAsnwer(array('task'=>$task->getAttributes(),
+        'project' => $proj->getAttributes(),
         'errors'=>$errors,
         'html' => $this->renderPartial('taskItem', array('task' => $task), true)),
         self::STATUS_OK, join('<br>', $errors));
@@ -174,7 +185,7 @@ class TaskTrackerController extends Controller
       $proj->name = $tpname;
 //      $proj->status = TaskProject::STATUS_ACTIVE;
       if (!$proj->save()) {
-        $this->jsonAsnwer(array('project' => $proj), self::STATUS_ERROR, CHtml::errorSummary($proj));
+        $this->jsonAsnwer(array('project' => $proj->getAttributes()), self::STATUS_ERROR, CHtml::errorSummary($proj));
         die();
       }
     }
@@ -190,7 +201,7 @@ class TaskTrackerController extends Controller
 
     $task->setAttributes($_REQUEST);
     if(!$task->validate() || !$task->save()) {
-      $this->jsonAsnwer(array('project' => $proj, 'task' => $task), self::STATUS_ERROR, CHtml::errorSummary($task) );
+      $this->jsonAsnwer(array('project' => $proj->getAttributes(), 'task' => $task->getAttributes()), self::STATUS_ERROR, CHtml::errorSummary($task) );
       die();
     }
     foreach($task->monthSchedule as $day) {
@@ -214,7 +225,11 @@ class TaskTrackerController extends Controller
       }
     }
     if(empty($errors)) {
-      $this->jsonAsnwer(array('task'=>$task, 'project' => $proj), self::STATUS_OK, 'Таск успешно обновлён');
+      $this->jsonAsnwer(array(
+          'task'=>$task->getAttributes(),
+          'project' => $proj->getAttributes(),
+          'html' => $this->renderPartial('taskItem', array('task' => $task), true)),
+        self::STATUS_OK, 'Таск успешно обновлён');
     } else {
       $this->jsonAsnwer(array('task'=>$task, 'project' => $proj, 'errors'=>$errors), self::STATUS_ERROR, join('<br>', $errors));
     }

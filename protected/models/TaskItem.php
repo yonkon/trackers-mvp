@@ -187,16 +187,17 @@ class TaskItem extends CActiveRecord
     $this->status_text = self::STATUS_TEXT_REPEATED;
     if(!empty($this->monthSchedule) ) {
       $this->close_date = $this->getNextCloseMonth();
+    } else {
+      if(!empty($this->week_schedule) ) {
+        $this->close_date = $this->getNextCloseWeek();
+      } else {
+        if(!empty($this->repeat_every) ) {
+          $this->close_date = $this->getNextCloseEvery();
+        }
+      }
     }
-    if(!empty($this->week_schedule) ) {
-      $this->close_date = $this->getNextCloseWeek();
-    }
-    if(!empty($this->repeat_every) ) {
-      $this->close_date = $this->getNextCloseEvery();
-    }
+
     return $this->save();
-
-
 
   }
 
@@ -214,10 +215,10 @@ class TaskItem extends CActiveRecord
       return false;
     }
     $lastCloseDay = intval(date('N', $this->close_date_int));
-    $lcdBit = intval($lastCloseDay);
+    $lcdBit = intval($lastCloseDay)-1;
     $d = false;
     for($days = 0; $days < 7; $days++ ) {
-      $nextCloseDay = ($lastCloseDay+$days) % 7 + 1;
+      $nextCloseDay = ($lcdBit+$days) % 7 ;
       if($this->week_schedule & pow(2,$nextCloseDay) ) {
         $d = $days+1;
         break;
@@ -245,14 +246,28 @@ class TaskItem extends CActiveRecord
     $mcd = $this->getMonthScheduleDays();
     $d = strtotime("{$lastCloseDay}/{$nextCloseMonth}/$nextCloseYear");
     foreach($mcd as $day) {
+      $maxDay = Helpers::getDaysInMonth($lastCloseMonth, $lastCloseYear);
+      if($maxDay < $day) {
+        $day = $maxDay;
+      }
       if($lastCloseDay < $day) {
         return $this->close_date_int+($day-$lastCloseDay)*Helpers::SECONDS_IN_DAY;
+        //        return strtotime("{$day}/{$lastCloseMonth}/$lastCloseYear");
       }
     }
     if(!empty($mcd[0])) {
-      return strtotime("{$mcd[0]}/{$nextCloseMonth}/{$nextCloseYear}");
+      /*if(Helpers::getDaysInMonth($nextCloseMonth, $nextCloseYear) < $mcd[0]) {
+        $nextCloseMonth++;
+      }*/
+      return strtotime("{$nextCloseMonth}/{$mcd[0]}/{$nextCloseYear}");
     }
     return false;
+  }
+
+  public function unexecute()
+  {
+    $this->status = self::STATUS_REPEATED;
+    return $this->save();
   }
 
 }

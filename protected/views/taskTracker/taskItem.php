@@ -16,5 +16,5 @@
   <div class="tstatus tstatus-<?= $task->status ?>"><?= $task->status_text ?></div>
   <div class="tproject"><?= $task->taskProject->name ?></div>
   <div class="tdescription"><?= $task->description?></div>
-  <div class="texecute"><input type="checkbox"></div>
+  <div class="texecute"><input type="checkbox" <?= $task->status == TaskItem::STATUS_EXECUTED ? ' checked="checked" ' : ''?>></div>
 </div>

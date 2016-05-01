@@ -160,11 +160,27 @@ $this->breadcrumbs=array(
           animatePopup(null, 'Невозможно обработать запрос', 'error');
         },
         success : function(res){
-          data = {};
+          var data = {};
           try {
             data = JSON.parse(res);
-            if(isAjaxGood()) {
-              createNewTask(data.data);
+            var ajaxGood = isAjaxGood(data);
+            if(ajaxGood) {
+              if(typeof tid != 'undefined' && tid) {
+                var $old_task = $('.task[data-id=' + tid + ']');
+                var $prev = $old_task.prev();
+                $old_task.remove();
+                var $task = $(data.data.html);
+                $task.insertAfter($prev);
+              } else {
+                 $task = $(data.data.html);
+                if(data.data.task) {
+                  $task.appendTo($('.soon'));
+                } else {
+                  $task.appendTo($('.today'));
+                }
+              }
+              $('.task .tedit').unbind('click').click(initEdit);
+              $('.task .texecute').unbind('click').click(initExecute);
             }
             animateAjaxMessage(data);
           } catch (exc) {
@@ -184,6 +200,15 @@ $this->breadcrumbs=array(
     });
     $('#new_task').click(function () {
       $('#task_id').val('');
+      updateWeekSchedule(0);
+      updateMonthSchedule('');
+      $('#task_name').val('');
+      $('#task_description').val('');
+      $('#task_status').val('');
+      $('#task_choose').val('');
+      $('#task_close_date').val('');
+      $('#task_repeated').removeAttr('checked');
+      $('#task_repeat_every').val('');
       $('#task_form').show();
       $('#tasks').hide();
     });
@@ -216,7 +241,46 @@ $this->breadcrumbs=array(
       $('#task_form').show();
       $('#tasks').hide();
     };
-    $('.task .tedit').click(initEdit);
+
+    var initExecute = function() {
+      var $this = $(this);
+      var $parent = $this.parents('.task');
+      var execute = 0;
+      if($this.find('input').is(':checked')) {
+        execute = 1;
+      }
+      $.ajax({
+        url : '<?= $app->createUrl('taskTracker/execute') ?>',
+        data : {
+          id : $parent.data('id'),
+          execute : execute
+        },
+        error : function() {
+          animatePopup(null, 'Невозможно обработать запрос' , 'error');
+        },
+        success : function(res) {
+          data = {};
+          try {
+            data = JSON.parse(res);
+            if(isAjaxGood(data)) {
+              var $prev = $parent.prev();
+              $parent.remove();
+              $(data.data.html).insertAfter($prev);
+              $('.task .tedit').unbind('click').click(initEdit);
+              $('.task .texecute').unbind('click').click(initExecute);
+            }
+            animateAjaxMessage(data);
+          } catch (exc) {
+            console.dir(esc);
+            console.dir(res);
+          }
+
+        }
+      })
+    };
+
+    $('.task .tedit').unbind('click').click(initEdit);
+    $('.task .texecute').unbind('click').click(initExecute);
 
     $('#task_close_date').datepicker({
       changeMonth: true,
@@ -278,7 +342,9 @@ $this->breadcrumbs=array(
       for(var i = 0; i<values.length; i++) {
         $this.parent().parent().append(rows[i]);
       }
-      $('.task .tedit').click(initEdit);
+      $('.task .tedit').unbind('click').click(initEdit);
+      $('.task .texecute').unbind('click').click(initExecute);
+
     });
 
     $('#task_week_schedule_values b').click(function(){
@@ -307,11 +373,7 @@ $this->breadcrumbs=array(
 
   });
 
-  var createNewTask = function(data) {
-    var proj = data.project;
-    var task = data.task;
 
-  };
 
   var updateMonthSchedule = function(days){
     var daysStr = Array.isArray(days) ? days.join(' ') : days;

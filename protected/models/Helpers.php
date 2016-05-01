@@ -111,4 +111,15 @@ class Helpers
     }
     return $monthNames[$lang][$monthNum];
   }
+
+  public static function getDaysInMonth($month = null, $year = null) {
+    if(empty($year)) {
+      $year = intval(date('Y'));
+    }
+    if(empty($month)) {
+      $month = intval(date('m'));
+    }
+    return cal_days_in_month(CAL_GREGORIAN, $month, $year);
+  }
+
 }
